@@ -1,6 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import dbConnect from '../../../lib/mongoose';
+import Retweet from '../../../models/Retweet';
 import Tweet from '../../../models/Tweet';
+import User from '../../../models/User';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
@@ -17,7 +19,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
   }
 
-  const tweets = await Tweet.find({userId}).sort({createdAt: -1}).populate('userId');
+  const tweets = await Tweet.find({userId}).sort({createdAt: -1}).populate('userId'); // finds User Tweets
 
   if (!tweets) {
     res.status(422).json({
@@ -25,5 +27,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         'Cannot find Tweets',
     });
   }
+
+  const followsTweets = await User.find({userId}).sort({createdAt: -1}).populate('follows');
+  console.log(followsTweets);
   res.status(200).json(tweets);
 }

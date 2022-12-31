@@ -30,7 +30,7 @@ export default function CreateTweet ({session}: Props) {
     }
   };
   return (
-    <StyledContainer>
+    <StyledContainer style={{marginBottom: 24}}>
       <strong>Tweet Something</strong>
       <hr />
 

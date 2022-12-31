@@ -18,6 +18,7 @@ interface Props {
 
 export default function TweetActions({tweet, session, setTweetData}: Props) {
   const [like, setLike] = useState(false);
+  const [retweets, setRetweets] = useState(false);
 
   const handleLike = async () => {
     await axios.post('/api/social/tweet-status', {
@@ -50,6 +51,38 @@ export default function TweetActions({tweet, session, setTweetData}: Props) {
     });
   };
 
+  const handleRetweet = async () => {
+    await axios.post('/api/social/tweet-status', {
+      action: 2,
+      tweetId: tweet._id,
+      userId: session?.id
+    }).then(response => {
+      if (response.data.isNew) {
+        setRetweets(true);
+        setTweetData(prev => {
+          const updatedData = {
+            ...prev,
+            retweets: [
+              ...prev.retweets,
+              session?.id
+            ],
+          };
+          console.log('Novo:', updatedData);
+          return updatedData;
+        });
+      } else {
+        setRetweets(false);
+        setTweetData(prev => {
+          const updatedData = {
+            ...prev,
+            retweets: prev.retweets.filter(userId => userId !== session?.id)
+          };
+          return updatedData;
+        });
+      }
+    });
+  };
+
   useEffect(() => {
     tweet.likes.map((data) => {
       if (!data) {
@@ -57,6 +90,15 @@ export default function TweetActions({tweet, session, setTweetData}: Props) {
       }
       if (data.toString() === session?.id) {
         setLike(true);
+      }
+    });
+    tweet.retweets.map((data) => {
+      if (!data) {
+        return;
+      }
+
+      if (data.toString() === session?.id) {
+        setRetweets(true);
       }
     });
   }, [session]);
@@ -67,9 +109,9 @@ export default function TweetActions({tweet, session, setTweetData}: Props) {
         <MdOutlineModeComment color='#4F4F4F' size={20}/>
         <span>Comment</span>
       </S.Action>
-      <S.Action>
-        <AiOutlineRetweet color='#4F4F4F' size={20}/>
-        <span>Retweet</span>
+      <S.Action onClick={handleRetweet}>
+        <AiOutlineRetweet color={retweets ? '#27AE60' :'#4F4F4F'} size={20}/>
+        <span style={retweets ? {color: '#27AE60'} : {}}>Retweet</span>
       </S.Action>
       <S.Action onClick={handleLike}>
         <IoMdHeartEmpty color={like ? '#EB5757' : '#4F4F4F'} size={20}/>

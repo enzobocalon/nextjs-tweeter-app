@@ -1,7 +1,6 @@
 import { createGlobalStyle } from 'styled-components';
 import styled from 'styled-components';
 
-
 export const GlobalStyle = createGlobalStyle`
   * {
     padding: 0;
@@ -9,7 +8,7 @@ export const GlobalStyle = createGlobalStyle`
     box-sizing: border-box;
   }
 
-  html, body {
+  html, body, #__next {
     height: 100vh;
     width: 100%;
     background-color: #f2f2f3;

@@ -1,4 +1,4 @@
-import { ObjectId, Types } from 'mongoose';
+import { ObjectId } from 'mongoose';
 import { User } from './User';
 
 export interface Tweet {
@@ -6,8 +6,8 @@ export interface Tweet {
   content: string,
   userId: User,
   likes: (string | ObjectId | undefined)[],
-  retweets: Types.ObjectId[],
-  replies: Types.ObjectId[],
+  retweets: (string | ObjectId | undefined)[]
+  replies: (string | ObjectId | undefined)[],
   createdAt: Date,
   media: string[]
 }

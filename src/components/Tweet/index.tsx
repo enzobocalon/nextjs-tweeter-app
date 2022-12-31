@@ -20,7 +20,7 @@ export default function Tweet({tweet, session}: Props) {
   const [tweetData, setTweetData] = useState<ITweet>(tweet);
 
   return (
-    <StyledContainer style={{marginTop: 24}}>
+    <StyledContainer style={{marginBottom: 24}}>
       <S.Header>
         <Image src={pfpPlaceholder} width={40} height={40} alt='profile icon' />
 
