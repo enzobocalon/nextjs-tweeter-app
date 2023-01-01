@@ -34,3 +34,18 @@ export const TweetContent = styled.div`
     margin-top: 18px;
   }
 `;
+
+export const RetweetedContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+
+  > span {
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 19px;
+    letter-spacing: -0.035em;
+    color: #828282;
+  }
+`;

@@ -8,7 +8,6 @@ import { MdOutlineModeComment, MdOutlineBookmarkBorder } from 'react-icons/md';
 import { AiOutlineRetweet } from 'react-icons/ai';
 import { IoMdHeartEmpty } from 'react-icons/io';
 import { Tweet } from '../../types/Tweet';
-import { ObjectId } from 'mongodb';
 
 interface Props {
   tweet: Tweet,
@@ -23,29 +22,54 @@ export default function TweetActions({tweet, session, setTweetData}: Props) {
   const handleLike = async () => {
     await axios.post('/api/social/tweet-status', {
       action: 1,
-      tweetId: tweet._id,
+      tweetId: tweet.tweetId ? tweet.tweetId._id : tweet._id,
       userId: session?.id
     }).then(response => {
       if (response.data.isNew) {
         setLike(true);
         setTweetData(prev => {
-          const updatedData = {
-            ...prev,
-            likes: [
-              ...prev.likes,
-              session?.id
-            ],
-          };
-          return updatedData;
+          if (prev.tweetId) {
+            const updatedData = {
+              ...prev,
+              tweetId: {
+                ...prev.tweetId,
+                likes: [
+                  ...prev.tweetId.likes,
+                  session?.id
+                ]
+              }
+            };
+            return updatedData;
+          } else {
+            const updatedData = {
+              ...prev,
+              likes: [
+                ...prev.likes,
+                session?.id
+              ],
+            };
+            return updatedData;
+          }
         });
       } else {
         setLike(false);
         setTweetData(prev => {
-          const updatedData = {
-            ...prev,
-            likes: prev.likes.filter(userId => userId !== session?.id)
-          };
-          return updatedData;
+          if (prev.tweetId) {
+            const updatedData = {
+              ...prev,
+              tweetId: {
+                ...prev.tweetId,
+                likes: prev.tweetId.likes.filter((user: string) => user !== session?.id)
+              }
+            };
+            return updatedData;
+          } else {
+            const updatedData = {
+              ...prev,
+              likes: prev.likes.filter(userId => userId !== session?.id)
+            };
+            return updatedData;
+          }
         });
       }
     });
@@ -54,7 +78,7 @@ export default function TweetActions({tweet, session, setTweetData}: Props) {
   const handleRetweet = async () => {
     await axios.post('/api/social/tweet-status', {
       action: 2,
-      tweetId: tweet._id,
+      tweetId: tweet.tweetId ? tweet.tweetId._id : tweet._id,
       userId: session?.id
     }).then(response => {
       if (response.data.isNew) {
@@ -67,7 +91,6 @@ export default function TweetActions({tweet, session, setTweetData}: Props) {
               session?.id
             ],
           };
-          console.log('Novo:', updatedData);
           return updatedData;
         });
       } else {
@@ -75,7 +98,7 @@ export default function TweetActions({tweet, session, setTweetData}: Props) {
         setTweetData(prev => {
           const updatedData = {
             ...prev,
-            retweets: prev.retweets.filter(userId => userId !== session?.id)
+            retweets: prev.tweetId ? prev.tweetId.retweets.filter((userId: string) => userId !== session?.id) : prev.retweets.filter(userId => userId !== session?.id)
           };
           return updatedData;
         });
@@ -84,23 +107,50 @@ export default function TweetActions({tweet, session, setTweetData}: Props) {
   };
 
   useEffect(() => {
-    tweet.likes.map((data) => {
-      if (!data) {
-        return;
-      }
-      if (data.toString() === session?.id) {
-        setLike(true);
-      }
-    });
-    tweet.retweets.map((data) => {
-      if (!data) {
-        return;
-      }
+    if (tweet.likes) {
+      tweet.likes.map((data) => {
+        if (!data) {
+          return;
+        }
+        if (data.toString() === session?.id) {
+          setLike(true);
+        }
+      });
+    } else {
+      tweet.tweetId.likes.map((data: Tweet) => {
+        if (!data) {
+          return;
+        }
 
-      if (data.toString() === session?.id) {
-        setRetweets(true);
-      }
-    });
+        if (data.toString() === session?.id) {
+          setLike(true);
+        }
+      });
+    }
+  }, [session]);
+
+  useEffect(() => {
+    if (tweet.retweets) {
+      tweet.retweets.map((data) => {
+        if (!data) {
+          return;
+        }
+
+        if (data.toString() === session?.id) {
+          setRetweets(true);
+        }
+      });
+    } else {
+      tweet.tweetId.retweets.map((data: Tweet) => {
+        if (!data) {
+          return;
+        }
+
+        if (data.toString() === session?.id) {
+          setRetweets(true);
+        }
+      });
+    }
   }, [session]);
 
   return (

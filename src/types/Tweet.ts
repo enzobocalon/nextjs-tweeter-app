@@ -2,6 +2,7 @@ import { ObjectId } from 'mongoose';
 import { User } from './User';
 
 export interface Tweet {
+  tweetId: any;
   _id: string,
   content: string,
   userId: User,

@@ -27,6 +27,11 @@ const UserSchema = new mongoose.Schema({
     required: false,
     default: ''
   },
+  bio: {
+    type: String,
+    required: false,
+    default: ''
+  },
   followed:  [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -50,7 +55,13 @@ const UserSchema = new mongoose.Schema({
     ref: 'Tweet',
     required: false,
     default: null
-  }]
+  }],
+  retweets: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Retweet',
+    required: false,
+    default: null
+  }],
 });
 
 export default mongoose.models['User'] || mongoose.model('User', UserSchema);

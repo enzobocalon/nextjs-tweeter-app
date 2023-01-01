@@ -3,31 +3,59 @@ import { StyledContainer } from '../../styles/global';
 import Image from 'next/image';
 
 import pfpPlaceholder from '../../assets/Profile_avatar_placeholder_large.png';
-import { MdImage } from 'react-icons/md';
+import { MdImage, MdGroup } from 'react-icons/md';
 import { IoMdGlobe } from 'react-icons/io';
 import Button from '../Button';
 import { Session } from 'next-auth/core/types';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 interface Props {
   session: Session | null
 }
 
 export default function CreateTweet ({session}: Props) {
-  console.log(session);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [privacy, setPrivacy] = useState(0); // 0 => public, 1 => private
   const content = useRef<HTMLTextAreaElement | null>(null);
+  const uploadFile = useRef<HTMLInputElement | null>(null);
+
+  const handlePrivacy = (value: number) => {
+    if (value) {
+      setPrivacy(1);
+      setIsModalOpen(false);
+    } else {
+      setPrivacy(0);
+      setIsModalOpen(false);
+    }
+  };
 
   const handleSubmit = async () => {
-    if (content.current) {
-      if (content.current.value) {
-        await axios.post('/api/social/create-tweet', {
-          content: content.current.value,
-          userId: session?.id,
-          media: null
-        });
-      }
+    const formData = new FormData();
+
+    if (!session) {
+      toast.error('Cannot submit Tweet - User not logged in!');
+      return null;
     }
+
+    if (uploadFile.current?.files) {
+      formData.append('media', uploadFile.current?.files[0]);
+    }
+
+    if (content.current?.value) {
+      formData.append('content', content.current.value);
+    }
+
+    formData.append('userId', session.id);
+    formData.append('privacy', privacy.toString());
+
+    await axios.post('/api/social/create-tweet', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+
   };
   return (
     <StyledContainer style={{marginBottom: 24}}>
@@ -41,12 +69,42 @@ export default function CreateTweet ({session}: Props) {
 
           <S.Footer>
             <S.LeftFooter>
+              <S.FooterItem onClick={() => uploadFile.current?.click()}>
+                <MdImage color='#2f80ed' />
+                <input type={'file'} hidden ref={uploadFile}/>
+              </S.FooterItem>
               <div>
-                <MdImage color='#2f80ed'/>
-              </div>
-              <div>
-                <IoMdGlobe color='#2f80ed'/>
-                <span>Everyone can reply</span>
+                <S.FooterItem onClick={() => setIsModalOpen(prev => !prev)}>
+                  {
+                    privacy === 0 ? (
+                      <>
+                        <IoMdGlobe color='#2f80ed'/>
+                        <span>Everyone can reply</span>
+                      </>
+                    ) : (
+                      <>
+                        <MdGroup color='#2f80ed'/>
+                        <span>People you follow</span>
+                      </>
+                    )
+                  }
+                </S.FooterItem>
+
+                <S.Modal showing={isModalOpen}>
+                  <StyledContainer>
+                    <strong>Who can reply?</strong>
+                    <p>Choose who can reply to this Tweet</p>
+
+                    <S.ModalItem onClick={() => handlePrivacy(0)}>
+                      <IoMdGlobe size={20}/>
+                      <span>Everyone</span>
+                    </S.ModalItem>
+                    <S.ModalItem onClick={() => handlePrivacy(1)}>
+                      <MdGroup size={20}/>
+                      <span>People you follow</span>
+                    </S.ModalItem>
+                  </StyledContainer>
+                </S.Modal>
               </div>
             </S.LeftFooter>
 

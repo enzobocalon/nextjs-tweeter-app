@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import dbConnect from '../../../lib/mongoose';
 import Retweet from '../../../models/Retweet';
 import Tweet from '../../../models/Tweet';
+import User from '../../../models/User';
 import { Tweet as ITweet } from '../../../types/Tweet';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -30,7 +31,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
       return;
     }
-    const hasUserAlreadyLiked = tweet.likes.filter(user => user === userId);
+    const hasUserAlreadyLiked = tweet.likes.filter(user => user !== new ObjectId(userId).valueOf());
     if (hasUserAlreadyLiked.length > 0) { // Remove Like if already liked
       await Tweet.findByIdAndUpdate(tweetId,
         {
@@ -64,24 +65,33 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const hasUserAlreadyRetweeted = await Retweet.findOne({tweetId: tweetId, userId: userId});
     if (hasUserAlreadyRetweeted) {
-      await Retweet.findOneAndDelete({tweetId: tweetId, userId: userId}); // removes from Retweet Collection
+      const retweet = await Retweet.findOneAndDelete({tweetId: tweetId, userId: userId}); // removes from Retweet Collection
       await Tweet.findByIdAndUpdate(tweetId,  { // Removes from Tweet's retweet array
         $pull: {
           retweets: userId
+        }
+      });
+      await User.findByIdAndUpdate(userId, {
+        $pull: {
+          retweets: retweet._id
         }
       });
       res.status(200).json({isNew: false});
       return;
     }
 
-    await Retweet.create({tweetId: tweetId, userId: userId});
+    const retweet = await Retweet.create({tweetId: tweetId, userId: userId});
     await Tweet.findByIdAndUpdate(tweetId, {
       $push: {
         retweets: userId
       }
     });
+    await User.findByIdAndUpdate(userId, {
+      $push: {
+        retweets: retweet._id
+      }
+    });
     res.status(200).json({isNew: true});
     return;
   }
-
 }

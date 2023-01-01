@@ -1,5 +1,9 @@
 import styled from 'styled-components';
 
+interface Props {
+  active: boolean;
+}
+
 export const TabContainer = styled.div`
   width: 100%;
   max-width: 300px;
@@ -12,7 +16,7 @@ export const TabContainer = styled.div`
   padding-left: 0;
 `;
 
-export const TabItem = styled.div`
+export const TabItem = styled.div<Props>`
   width: 100%;
   padding: .5rem 2rem;
   margin-block: .5rem;
@@ -21,7 +25,7 @@ export const TabItem = styled.div`
   cursor: pointer;
 
   ::before {
-    opacity: 0;
+    opacity: ${({active}) => active ? '1' : '0'};
     content: '';
     position: absolute;
     height: 100%;

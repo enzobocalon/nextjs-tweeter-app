@@ -39,7 +39,6 @@ export default function Home({tweets}: Props) {
 }
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context);
-  console.log('Session:', session);
 
   if (!session) {
     context.res.writeHead(302, {Location: '/login'});
@@ -54,8 +53,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       userId: session.id
     }
   });
-
-  console.log(tweets.data);
 
   return {
     props: {

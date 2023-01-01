@@ -10,9 +10,13 @@ import Tweet from '../components/Tweet';
 import axios from 'axios';
 import { getSession, useSession } from 'next-auth/react';
 import { Tweet as ITweet } from '../types/Tweet';
+import { User } from '../types/User';
 
 interface Props {
-  tweets: ITweet[]
+  tweets: [
+    User,
+    ITweet[]
+  ]
 }
 
 export default function Profile ({tweets}: Props) {
@@ -29,11 +33,13 @@ export default function Profile ({tweets}: Props) {
           <S.Feed>
             <ProfileTab />
             <S.TweetsContainer>
-              {
-                tweets.map(tweet => (
-                  <Tweet key={tweet._id} tweet={tweet} session={session}/>
-                ))
-              }
+              <>
+                {
+                  tweets[1].map((tweet: ITweet) => (
+                    <Tweet key={tweet._id} tweet={tweet} session={session} name={tweets[0].name} isRetweet={tweet.tweetId ? true : false}/>
+                  ))
+                }
+              </>
             </S.TweetsContainer>
           </S.Feed>
         </S.Content>
@@ -44,8 +50,8 @@ export default function Profile ({tweets}: Props) {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context);
-  console.log('Session:', session);
 
+  // Must be deleted, not logged users SHOULD BE ABLE to see profiles
   if (!session) {
     context.res.writeHead(302, {Location: '/login'});
     context.res.end();
@@ -54,18 +60,28 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
   }
 
-  const tweets = await axios.get('http://localhost:3000/api/social/timeline', {
+  const {params} = context;
+
+  const tweets = await axios.get('http://localhost:3000/api/social/profile-data', {
     params: {
-      userId: session.id
+      username: params?.username
     }
   });
 
-  console.log(tweets.data);
+  // Try to merge and sort both arrays
+
+  const mergedData = [tweets.data[0], tweets.data[0].tweets.concat(tweets.data[1])];
+  const sortedData = [
+    mergedData[0],
+    mergedData[1].sort((a: ITweet, b: ITweet) => {
+      return new Date (b.createdAt).valueOf() - new Date(a.createdAt).valueOf();
+    })
+  ];
 
   return {
     props: {
       session,
-      tweets: tweets.data
+      tweets: sortedData
     }
   };
 };

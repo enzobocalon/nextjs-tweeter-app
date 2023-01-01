@@ -27,8 +27,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         'Cannot find Tweets',
     });
   }
-
+  // TODO: Should be querying followers tweets
   const followsTweets = await User.find({userId}).sort({createdAt: -1}).populate('follows');
-  console.log(followsTweets);
+
   res.status(200).json(tweets);
 }

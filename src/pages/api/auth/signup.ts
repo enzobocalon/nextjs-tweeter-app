@@ -37,8 +37,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const findByUsername = await User.find({username: username});
   const findByEmail = await User.find({email: email});
 
-  console.log(findByEmail);
-  console.log(findByUsername);
 
   if (findByUsername.length > 0) {
     res.status(422).json({
@@ -58,8 +56,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const hashedPassword = await hashPassword(password);
 
   if (!hashedPassword) {
-    console.log('teste');
-
     res.status(500).json({
       message: 'Internal Server Error - Contact Support'
     });

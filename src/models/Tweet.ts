@@ -3,7 +3,8 @@ import mongoose from 'mongoose';
 const TweetSchema = new mongoose.Schema({
   content: {
     type: String,
-    required: true
+    required: false,
+    default: null
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -35,6 +36,11 @@ const TweetSchema = new mongoose.Schema({
   media: {
     type: [String],
     default: [''],
+  },
+  public: {
+    type: Boolean,
+    default: true,
+    required: true
   }
 });
 

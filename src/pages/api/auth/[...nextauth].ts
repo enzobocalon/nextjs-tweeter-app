@@ -24,7 +24,6 @@ const options: NextAuthOptions = {
         if (!credentials) {
           return null;
         }
-        console.log(credentials);
 
         if (!credentials.email || !credentials.password) {
           throw new Error('Please provide the required data');
@@ -37,8 +36,7 @@ const options: NextAuthOptions = {
         if (!user) {
           throw new Error('No user found');
         }
-        console.log(user);
-
+        
         // Verify password
         const verifiedPassword = verifyPassword(credentials.password, user.password);
 

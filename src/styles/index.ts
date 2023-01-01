@@ -3,8 +3,6 @@ import styled from 'styled-components';
 export const Container = styled.main`
   width: 100%;
   max-width: 1100px;
-  height: 100%;
-  max-height: calc(100vh - 73px);
   padding: 1.5rem .5rem;
   margin-inline: auto;
 
