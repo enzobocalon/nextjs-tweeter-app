@@ -6,8 +6,9 @@ export interface User {
   email: string,
   banner: string,
   avatar: string,
-  followed: User[],
-  follows: User[],
+  bio: string,
+  followed: (string | User | undefined)[],
+  follows: (string | User | undefined)[],
   likes: string[], // temporary
   tweets: string[] // temporary
 }

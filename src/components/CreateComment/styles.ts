@@ -30,14 +30,42 @@ export const TextAreaContent = styled.div`
   }
 `;
 
-export const TextArea = styled.div`
+export const TextArea = styled.textarea`
   width: 100%;
-  max-height: 60px;
+  max-height: 40px;
   overflow-y: auto;
   outline: none;
+  resize: none;
+  border: none;
+  outline: none;
+  background-color: transparent;
+  font-family: 'Noto Sans',sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 22px;
 
   ::-webkit-scrollbar {
-    display: none;
+    width: 20px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: #d6dee1;
+    border-radius: 20px;
+    border: 6px solid transparent;
+    background-clip: content-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #a8bbbf;
+  }
+
+  &::placeholder {
+    color: #bdbdbd;
   }
 
 `;

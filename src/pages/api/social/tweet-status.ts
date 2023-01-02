@@ -1,6 +1,7 @@
 import { ObjectId } from 'mongodb';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import dbConnect from '../../../lib/mongoose';
+import Bookmark from '../../../models/Bookmark';
 import Retweet from '../../../models/Retweet';
 import Tweet from '../../../models/Tweet';
 import User from '../../../models/User';
@@ -31,7 +32,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
       return;
     }
-    const hasUserAlreadyLiked = tweet.likes.filter(user => user !== new ObjectId(userId).valueOf());
+
+    const hasUserAlreadyLiked = tweet.likes.filter(user => user?.toString() === userId);
     if (hasUserAlreadyLiked.length > 0) { // Remove Like if already liked
       await Tweet.findByIdAndUpdate(tweetId,
         {
@@ -89,6 +91,41 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await User.findByIdAndUpdate(userId, {
       $push: {
         retweets: retweet._id
+      }
+    });
+    res.status(200).json({isNew: true});
+    return;
+  }
+
+  if (action === 3) { // Bookmarks
+    const tweet: ITweet | null = await Tweet.findOne({_id: tweetId}); // check if Tweet does exist
+    if (!tweet) {
+      res.status(422).json({
+        message:
+          'No Tweet found',
+      });
+      return;
+    }
+
+    const hasTweetAlreadyBeenBookmarked = await Bookmark.find({tweetId: tweetId, userId: userId});
+    if (hasTweetAlreadyBeenBookmarked.length > 0) {
+      await Bookmark.findOneAndDelete({tweetId: tweetId, userId: userId});
+      await Tweet.findOneAndUpdate(tweetId, {
+        $pull: {
+          bookmarks: userId
+        }
+      });
+      res.status(200).json({isNew: false});
+      return;
+    }
+
+    await Bookmark.create({
+      tweetId: tweetId,
+      userId: userId
+    });
+    await Tweet.findByIdAndUpdate(tweetId, {
+      $push: {
+        bookmarks: userId
       }
     });
     res.status(200).json({isNew: true});

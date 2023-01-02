@@ -34,7 +34,7 @@ apiRoute.post(async (req, res) => {
   const {content, userId, privacy} = req.body;
 
   if (!userId) {
-    res.status(422).json({
+    res.status(404).json({
       message:
         'User not found',
     });
@@ -49,7 +49,7 @@ apiRoute.post(async (req, res) => {
     privacy
   });
 
-  await User.findOneAndUpdate(userId, {
+  await User.findOneAndUpdate({_id: userId}, {
     $push: {
       tweets: tweet._id
     }

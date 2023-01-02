@@ -8,10 +8,11 @@ import { MdOutlineKeyboardArrowDown, MdHome, MdBookmark, MdOutlineGroup, MdSetti
 import { IoMdCompass } from 'react-icons/io';
 
 import { FaUserCircle } from 'react-icons/fa';
-import { signOut } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 
 export default function Header() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const {data: session} = useSession();
 
   return (
     <S.Container>
@@ -34,7 +35,7 @@ export default function Header() {
 
       <S.ProfileContainer onClick={() => setIsModalOpen(prev => !prev)}>
         <Image src={pfpPlaceholder} width={32} height={32} alt='profile icon' />
-        <span>Xanthe Neal</span>
+        <span>{session?.user?.name}</span>
         <MdOutlineKeyboardArrowDown/>
 
         <S.Modal showing={isModalOpen} onClick={(e) => e.stopPropagation()}>

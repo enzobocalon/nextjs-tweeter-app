@@ -36,7 +36,7 @@ const options: NextAuthOptions = {
         if (!user) {
           throw new Error('No user found');
         }
-        
+
         // Verify password
         const verifiedPassword = verifyPassword(credentials.password, user.password);
 

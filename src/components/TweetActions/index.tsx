@@ -1,6 +1,5 @@
 import axios from 'axios';
-import { Session } from 'next-auth';
-import { useState, useEffect, Dispatch, SetStateAction } from 'react';
+import { useState, useEffect, Dispatch, SetStateAction, MutableRefObject } from 'react';
 
 import * as S from './styles';
 
@@ -8,23 +7,26 @@ import { MdOutlineModeComment, MdOutlineBookmarkBorder } from 'react-icons/md';
 import { AiOutlineRetweet } from 'react-icons/ai';
 import { IoMdHeartEmpty } from 'react-icons/io';
 import { Tweet } from '../../types/Tweet';
+import { useSession } from 'next-auth/react';
 
 interface Props {
   tweet: Tweet,
-  session: Session | null,
   setTweetData: Dispatch<SetStateAction<Tweet>>
+  refComment: MutableRefObject<HTMLTextAreaElement | null>
 }
 
-export default function TweetActions({tweet, session, setTweetData}: Props) {
+export default function TweetActions({tweet, setTweetData, refComment}: Props) {
   const [like, setLike] = useState(false);
   const [retweets, setRetweets] = useState(false);
+  const [bookmarks, setBookmarks] = useState(false);
+  const {data: session} = useSession();
 
   const handleLike = async () => {
     await axios.post('/api/social/tweet-status', {
       action: 1,
       tweetId: tweet.tweetId ? tweet.tweetId._id : tweet._id,
       userId: session?.id
-    }).then(response => {
+    }).then((response) => {
       if (response.data.isNew) {
         setLike(true);
         setTweetData(prev => {
@@ -46,7 +48,7 @@ export default function TweetActions({tweet, session, setTweetData}: Props) {
               likes: [
                 ...prev.likes,
                 session?.id
-              ],
+              ]
             };
             return updatedData;
           }
@@ -59,14 +61,14 @@ export default function TweetActions({tweet, session, setTweetData}: Props) {
               ...prev,
               tweetId: {
                 ...prev.tweetId,
-                likes: prev.tweetId.likes.filter((user: string) => user !== session?.id)
+                likes: prev.tweetId.likes.filter((data: string) => data !== session?.id)
               }
             };
             return updatedData;
           } else {
             const updatedData = {
               ...prev,
-              likes: prev.likes.filter(userId => userId !== session?.id)
+              likes: prev.likes.filter(data => data !== session?.id)
             };
             return updatedData;
           }
@@ -80,82 +82,94 @@ export default function TweetActions({tweet, session, setTweetData}: Props) {
       action: 2,
       tweetId: tweet.tweetId ? tweet.tweetId._id : tweet._id,
       userId: session?.id
-    }).then(response => {
+    }).then((response) => {
       if (response.data.isNew) {
         setRetweets(true);
         setTweetData(prev => {
-          const updatedData = {
-            ...prev,
-            retweets: [
-              ...prev.retweets,
-              session?.id
-            ],
-          };
-          return updatedData;
+          if (prev.tweetId) {
+            const updatedData = {
+              ...prev,
+              tweetId: {
+                ...prev.tweetId,
+                retweets: [
+                  ...prev.tweetId.retweets,
+                  session?.id
+                ]
+              }
+            };
+            return updatedData;
+          } else {
+            const updatedData = {
+              ...prev,
+              retweets: [
+                ...prev.retweets,
+                session?.id
+              ]
+            };
+            return updatedData;
+          }
         });
       } else {
         setRetweets(false);
         setTweetData(prev => {
-          const updatedData = {
-            ...prev,
-            retweets: prev.tweetId ? prev.tweetId.retweets.filter((userId: string) => userId !== session?.id) : prev.retweets.filter(userId => userId !== session?.id)
-          };
-          return updatedData;
+          if (prev.tweetId) {
+            const updatedData = {
+              ...prev,
+              tweetId: {
+                ...prev.tweetId,
+                retweets: prev.tweetId.retweets.filter((data: string) => data !== session?.id)
+              }
+            };
+            return updatedData;
+          } else {
+            const updatedData = {
+              ...prev,
+              retweets: prev.retweets.filter(data => data !== session?.id)
+            };
+            return updatedData;
+          }
         });
       }
     });
   };
 
-  useEffect(() => {
-    if (tweet.likes) {
-      tweet.likes.map((data) => {
-        if (!data) {
-          return;
-        }
-        if (data.toString() === session?.id) {
-          setLike(true);
-        }
-      });
-    } else {
-      tweet.tweetId.likes.map((data: Tweet) => {
-        if (!data) {
-          return;
-        }
-
-        if (data.toString() === session?.id) {
-          setLike(true);
-        }
-      });
-    }
-  }, [session]);
+  const handleBookmark = async () => {
+    await axios.post('/api/social/tweet-status', {
+      action: 3,
+      userId: session?.id,
+      tweetId: tweet.tweetId ? tweet.tweetId._id : tweet._id
+    }).then((response => {
+      if (response.data.isNew) {
+        setBookmarks(true);
+      } else {
+        setBookmarks(false);
+      }
+    }));
+  };
 
   useEffect(() => {
-    if (tweet.retweets) {
-      tweet.retweets.map((data) => {
-        if (!data) {
-          return;
-        }
+    (tweet.likes || tweet.tweetId.likes).map((data) => {
+      if (data === session?.id) {
+        setLike(true);
+      }
+    });
 
-        if (data.toString() === session?.id) {
-          setRetweets(true);
-        }
-      });
-    } else {
-      tweet.tweetId.retweets.map((data: Tweet) => {
-        if (!data) {
-          return;
-        }
+    (tweet.retweets || tweet.tweetId.retweets).map((data) => {
+      if (data === session?.id) {
+        setRetweets(true);
+      }
+    });
 
-        if (data.toString() === session?.id) {
-          setRetweets(true);
-        }
-      });
-    }
+    (tweet.bookmarks || tweet.tweetId.bookmarks).map((data) => {
+      if (data === session?.id) {
+        setBookmarks(true);
+      }
+    });
   }, [session]);
 
   return (
     <S.Container>
-      <S.Action>
+      <S.Action onClick={() => refComment.current?.focus()}>
         <MdOutlineModeComment color='#4F4F4F' size={20}/>
         <span>Comment</span>
       </S.Action>
@@ -167,9 +181,9 @@ export default function TweetActions({tweet, session, setTweetData}: Props) {
         <IoMdHeartEmpty color={like ? '#EB5757' : '#4F4F4F'} size={20}/>
         <span style={like ? {color: '#EB5757'} : {}}>Like</span>
       </S.Action>
-      <S.Action>
-        <MdOutlineBookmarkBorder color='#4F4F4F' size={20}/>
-        <span>Save</span>
+      <S.Action onClick={() => handleBookmark()}>
+        <MdOutlineBookmarkBorder color={bookmarks ? '#2D9CDB': '#4F4F4F'} size={20}/>
+        <span style={bookmarks ? {color: '#2D9CDB'} : {}}>Save</span>
       </S.Action>
     </S.Container>
   );

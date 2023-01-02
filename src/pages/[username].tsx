@@ -16,10 +16,11 @@ interface Props {
   tweets: [
     User,
     ITweet[]
-  ]
+  ],
+  isFollowing: boolean;
 }
 
-export default function Profile ({tweets}: Props) {
+export default function Profile ({tweets, isFollowing}: Props) {
   const {data: session} = useSession();
 
   return (
@@ -29,14 +30,14 @@ export default function Profile ({tweets}: Props) {
         <Image src={imagePlaceholder} alt='banner' />
 
         <S.Content>
-          <ProfileInfo />
+          <ProfileInfo profile={tweets[0]} session={session} isFollowing={isFollowing}/>
           <S.Feed>
             <ProfileTab />
             <S.TweetsContainer>
               <>
                 {
-                  tweets[1].map((tweet: ITweet) => (
-                    <Tweet key={tweet._id} tweet={tweet} session={session} name={tweets[0].name} isRetweet={tweet.tweetId ? true : false}/>
+                  tweets[1].map(tweet => (
+                    <Tweet key={tweet._id} tweet={tweet} profile={tweets[0]} isRetweet={tweet.tweetId ? true : false} />
                   ))
                 }
               </>
@@ -51,15 +52,6 @@ export default function Profile ({tweets}: Props) {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context);
 
-  // Must be deleted, not logged users SHOULD BE ABLE to see profiles
-  if (!session) {
-    context.res.writeHead(302, {Location: '/login'});
-    context.res.end();
-    return {
-      props: {}
-    };
-  }
-
   const {params} = context;
 
   const tweets = await axios.get('http://localhost:3000/api/social/profile-data', {
@@ -68,9 +60,16 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
   });
 
-  // Try to merge and sort both arrays
+  const followingStatus = await axios.get('http://localhost:3000/api/social/follow', {
+    params: {
+      action: 1,
+      username: params?.username,
+      sessionId: session?.id
+    }
+  });
 
-  const mergedData = [tweets.data[0], tweets.data[0].tweets.concat(tweets.data[1])];
+
+  const mergedData = [tweets.data[0], tweets.data[0].tweets.concat(tweets.data[1])]; // [0] => user, [1] => tweets + retweets
   const sortedData = [
     mergedData[0],
     mergedData[1].sort((a: ITweet, b: ITweet) => {
@@ -80,8 +79,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   return {
     props: {
-      session,
-      tweets: sortedData
+      tweets: sortedData,
+      isFollowing: followingStatus.data.isFollowing
     }
   };
 };

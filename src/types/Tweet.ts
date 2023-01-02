@@ -9,6 +9,7 @@ export interface Tweet {
   likes: (string | ObjectId | undefined)[],
   retweets: (string | ObjectId | undefined)[]
   replies: (string | ObjectId | undefined)[],
+  bookmarks: (string | ObjectId | undefined)[],
   createdAt: Date,
   media: string[]
 }

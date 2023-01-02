@@ -20,10 +20,11 @@ const TweetSchema = new mongoose.Schema({
     ref: 'User',
     default: null
   }],
-  bookmarks: {
-    type: Number,
-    default: 0,
-  },
+  bookmarks: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Bookmark',
+    default: null,
+  }],
   replies: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Reply',
