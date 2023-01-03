@@ -48,6 +48,14 @@ export const CommentHeader = styled.div`
 
 export const Comment = styled.div`
   margin-top: 8px;
+
+  img {
+    width: 100%;
+    max-width: 500px;
+    height: 100%;
+    max-height: 500px;
+    margin-top: 8px;
+  }
 `;
 
 export const FooterContainer = styled.div`

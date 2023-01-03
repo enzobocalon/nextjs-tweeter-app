@@ -85,6 +85,9 @@ export default function Comments({reply}: Props) {
           </S.CommentHeader>
           <S.Comment>
             <p>{replyState?.content}</p>
+            {
+              reply.media && reply.media[0] !== ''  ? <img src={`./uploads/${reply.media[0]}`} alt='image'/> : null
+            }
           </S.Comment>
         </S.CommentContentContainer>
         <S.FooterContainer>
