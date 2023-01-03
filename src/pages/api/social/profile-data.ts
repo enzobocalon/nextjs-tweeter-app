@@ -22,7 +22,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const user = await User
     .find({username}, {password: 0, email: 0})
     .populate({
-      path: 'tweets', model: Tweet, options: {sort: {'createdAt': -1}, populate: {path: 'userId', select: '-password -email'}}
+      path: 'tweets', model: Tweet,
+      options: {sort: {'createdAt': -1},
+        populate: {path: 'userId', select: '-password -email'}}
     });
 
   const retweets = await Retweet

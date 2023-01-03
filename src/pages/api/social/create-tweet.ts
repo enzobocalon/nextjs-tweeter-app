@@ -46,7 +46,7 @@ apiRoute.post(async (req, res) => {
     content,
     media: filename,
     userId,
-    privacy
+    public: (privacy === 'true')
   });
 
   await User.findOneAndUpdate({_id: userId}, {

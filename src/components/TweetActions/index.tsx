@@ -12,10 +12,10 @@ import { useSession } from 'next-auth/react';
 interface Props {
   tweet: Tweet,
   setTweetData: Dispatch<SetStateAction<Tweet>>
-  refComment: MutableRefObject<HTMLTextAreaElement | null>
+  handleComments: () => void
 }
 
-export default function TweetActions({tweet, setTweetData, refComment}: Props) {
+export default function TweetActions({tweet, setTweetData, handleComments}: Props) {
   const [like, setLike] = useState(false);
   const [retweets, setRetweets] = useState(false);
   const [bookmarks, setBookmarks] = useState(false);
@@ -169,7 +169,7 @@ export default function TweetActions({tweet, setTweetData, refComment}: Props) {
 
   return (
     <S.Container>
-      <S.Action onClick={() => refComment.current?.focus()}>
+      <S.Action onClick={() => handleComments()}>
         <MdOutlineModeComment color='#4F4F4F' size={20}/>
         <span>Comment</span>
       </S.Action>

@@ -17,18 +17,13 @@ interface Props {
 
 export default function CreateTweet ({session}: Props) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [privacy, setPrivacy] = useState(0); // 0 => public, 1 => private
+  const [publicContent, setPublicContent] = useState(true);
   const content = useRef<HTMLTextAreaElement | null>(null);
   const uploadFile = useRef<HTMLInputElement | null>(null);
 
-  const handlePrivacy = (value: number) => {
-    if (value) {
-      setPrivacy(1);
-      setIsModalOpen(false);
-    } else {
-      setPrivacy(0);
-      setIsModalOpen(false);
-    }
+  const handlePrivacy = (isPublic: boolean) => {
+    setPublicContent(isPublic);
+    setIsModalOpen(false);
   };
 
   const handleSubmit = async () => {
@@ -48,7 +43,7 @@ export default function CreateTweet ({session}: Props) {
     }
 
     formData.append('userId', session.id);
-    formData.append('privacy', privacy.toString());
+    formData.append('privacy', publicContent.toString());
 
     await axios.post('/api/social/create-tweet', formData, {
       headers: {
@@ -76,7 +71,7 @@ export default function CreateTweet ({session}: Props) {
               <div>
                 <S.FooterItem onClick={() => setIsModalOpen(prev => !prev)}>
                   {
-                    privacy === 0 ? (
+                    publicContent ? (
                       <>
                         <IoMdGlobe color='#2f80ed'/>
                         <span>Everyone can reply</span>
@@ -95,11 +90,11 @@ export default function CreateTweet ({session}: Props) {
                     <strong>Who can reply?</strong>
                     <p>Choose who can reply to this Tweet</p>
 
-                    <S.ModalItem onClick={() => handlePrivacy(0)}>
+                    <S.ModalItem onClick={() => handlePrivacy(true)}>
                       <IoMdGlobe size={20}/>
                       <span>Everyone</span>
                     </S.ModalItem>
-                    <S.ModalItem onClick={() => handlePrivacy(1)}>
+                    <S.ModalItem onClick={() => handlePrivacy(false)}>
                       <MdGroup size={20}/>
                       <span>People you follow</span>
                     </S.ModalItem>

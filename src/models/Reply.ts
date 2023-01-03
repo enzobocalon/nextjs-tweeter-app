@@ -10,11 +10,11 @@ const ReplySchema = new mongoose.Schema({
     required: true,
     ref: 'User'
   },
-  likes: {
-    type: Number,
-    required: true,
-    default: 0,
-  },
+  likes: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null
+  }],
   repliesTo: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,

@@ -14,6 +14,8 @@ import { Tweet as ITweet } from '../../types/Tweet';
 import { User } from '../../types/User';
 
 import pfpPlaceholder from '../../assets/Profile_avatar_placeholder_large.png';
+import { ClipLoader } from 'react-spinners';
+import axios from 'axios';
 
 interface Props {
   tweet: ITweet,
@@ -23,7 +25,25 @@ interface Props {
 
 export default function Tweet({tweet, profile, isRetweet}: Props) {
   const [tweetData, setTweetData] = useState<ITweet>(tweet);
+  const [replies, setReplies] = useState<ITweet[] | null>(null);
+  const [commentLoading, setCommentLoading] = useState(false);
   const commentRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const handleComments = async () => {
+    commentRef.current?.focus();
+    setReplies(null);
+    setCommentLoading(true);
+
+    await axios.get('/api/social/reply', {
+      params: {
+        tweetId: tweet.tweetId ? tweet.tweetId._id : tweet._id
+      }
+    }).then(response => {
+      setReplies(response.data);
+      setCommentLoading(false);
+    });
+
+  };
   return (
     <>
       {
@@ -55,9 +75,40 @@ export default function Tweet({tweet, profile, isRetweet}: Props) {
           likes={tweetData.likes || tweetData.tweetId.likes}
           replies={tweetData.replies || tweetData.tweetId.replies}
           retweets={tweetData.retweets || tweetData.tweetId.retweets}/>
-        <TweetActions tweet={tweetData} setTweetData={setTweetData} refComment={commentRef}/>
-        <CreateComment refTextarea={commentRef}/>
-        <Comments />
+        <TweetActions
+          tweet={tweetData}
+          setTweetData={setTweetData}
+          handleComments={handleComments}/>
+        <CreateComment
+          refTextarea={commentRef}
+          tweet={tweet}
+          tweetId={tweet.tweetId ? tweet.tweetId._id : tweet._id}
+          replies={replies}
+          setReplies={setReplies}/>
+
+        {
+          !replies || commentLoading ? tweet.tweetId ? tweet.tweetId.replies.length > 0 ? (
+            <p
+              style={{color: '#BDBDBD', marginTop: 4, cursor: 'pointer'}}
+              onClick={() => handleComments()}>
+              Show Replies
+            </p>
+          ) : null : tweet.replies.length > 0 ? (
+            <p
+              style={{color: '#BDBDBD', marginTop: 4, cursor: 'pointer'}}
+              onClick={() => handleComments()}>
+              Show Replies
+            </p>
+          ) : null : null
+        }
+
+        {
+          commentLoading ? (
+            <ClipLoader size={16} color='#2f80ed'/>
+          ) : replies ? replies.map(reply => (
+            <Comments key={reply._id} reply={reply} />
+          )) : null
+        }
       </StyledContainer>
     </>
   );
