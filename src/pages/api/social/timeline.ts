@@ -11,24 +11,51 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   await dbConnect();
   const { userId } = req.query;
-  //Temporary
+
   if (!userId) {
     res.status(422).json({
       message:
-        'Invalid User',
+        'User not Provided',
     });
+    return;
   }
 
-  const tweets = await Tweet.find({userId}).sort({createdAt: -1}).populate('userId'); // finds User Tweets
+  const user = await User
+    .findById(userId)
+    .select('-password -email');
 
-  if (!tweets) {
-    res.status(422).json({
+  if (!user) {
+    res.status(404).json({
       message:
-        'Cannot find Tweets',
+        'User not found',
     });
+    return;
   }
-  // TODO: Should be querying followers tweets
-  const followsTweets = await User.find({userId}).sort({createdAt: -1}).populate('follows');
 
-  res.status(200).json(tweets);
+  const selfTweets = await Tweet
+    .find({userId})
+    .sort({createdAt: -1})
+    .populate({path: 'userId', select: '-password -email'});
+  const followersTweets = await Tweet
+    .find()
+    .where('userId')
+    .in(user.follows)
+    .sort({createdAt: -1})
+    .populate({path: 'userId', select: '-password -email'});
+  const followersRetweets = await Retweet
+    .find()
+    .where('userId')
+    .in(user.follows)
+    .sort({createdAt: -1})
+    .populate({path: 'userId', select: '-password -email'})
+    .populate({path: 'tweetId', model: Tweet, populate: {path: 'userId', select: '-password -email'}});
+
+  const mergedData = selfTweets.concat(followersTweets).concat(followersRetweets);
+  const sortedData = mergedData.sort((a: Omit<any, never>, b: Omit<any, never>) => {
+    return new Date (b.createdAt).valueOf() - new Date(a.createdAt).valueOf();
+  });
+
+  const suggestionsUsers = (await User.find().select('-password -email'))
+    .filter(userSuggestion => userSuggestion._id.valueOf() !== user._id.valueOf() && !user.follows.includes(userSuggestion._id));
+  res.status(201).json([sortedData, suggestionsUsers]);
 }

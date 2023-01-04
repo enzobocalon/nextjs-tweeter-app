@@ -52,35 +52,43 @@ export default function Profile ({tweets, isFollowing}: Props) {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context);
 
-  const {params} = context;
+  const { params } = context;
 
-  const tweets = await axios.get('http://localhost:3000/api/social/profile-data', {
-    params: {
-      username: params?.username
-    }
-  });
+  try {
+    const tweets = await axios.get('http://localhost:3000/api/social/profile-data', {
+      params: {
+        username: params?.username
+      }
+    });
 
-  const followingStatus = await axios.get('http://localhost:3000/api/social/follow', {
-    params: {
-      action: 1,
-      username: params?.username,
-      sessionId: session?.id
-    }
-  });
+    const followingStatus = await axios.get('http://localhost:3000/api/social/follow', {
+      params: {
+        action: 1,
+        username: params?.username,
+        sessionId: session?.id
+      }
+    });
 
+    const mergedData = [tweets.data[0], tweets?.data[0].tweets.concat(tweets.data[1])]; // [0] => user, [1] => tweets + retweets
+    const sortedData = [
+      mergedData[0],
+      mergedData[1].sort((a: ITweet, b: ITweet) => {
+        return new Date (b.createdAt).valueOf() - new Date(a.createdAt).valueOf();
+      })
+    ];
 
-  const mergedData = [tweets.data[0], tweets.data[0].tweets.concat(tweets.data[1])]; // [0] => user, [1] => tweets + retweets
-  const sortedData = [
-    mergedData[0],
-    mergedData[1].sort((a: ITweet, b: ITweet) => {
-      return new Date (b.createdAt).valueOf() - new Date(a.createdAt).valueOf();
-    })
-  ];
-
-  return {
-    props: {
-      tweets: sortedData,
-      isFollowing: followingStatus.data.isFollowing
-    }
-  };
+    return {
+      props: {
+        tweets: sortedData,
+        isFollowing: followingStatus.data.isFollowing,
+        notFound: false
+      }
+    };
+  } catch (error) {
+    context.res.writeHead(302, {Location: '/404'});
+    context.res.end();
+    return {
+      props: {}
+    };
+  }
 };

@@ -8,12 +8,14 @@ import * as S from '../styles/index';
 import { GetServerSideProps } from 'next/types';
 import axios from 'axios';
 import { Tweet as ITweet } from '../types/Tweet';
+import { User } from '../types/User';
 
 interface Props {
   tweets: ITweet[]
+  suggestions: User[]
 }
 
-export default function Home({tweets}: Props) {
+export default function Home({tweets, suggestions}: Props) {
   const {data: session} = useSession();
   return (
     <>
@@ -24,14 +26,14 @@ export default function Home({tweets}: Props) {
           <CreateTweet session={session}/>
           {
             tweets.map(tweet => (
-              <Tweet key={tweet._id} tweet={tweet} session={session}/>
+              <Tweet key={tweet._id} tweet={tweet.tweetId ? tweet.tweetId : tweet} profile={tweet.userId} isRetweet={tweet.tweetId ? true : false}/>
             ))
           }
 
         </S.MainContent>
         <S.AsideContent>
           <Trending />
-          <Suggestion />
+          <Suggestion suggestions={suggestions}/>
         </S.AsideContent>
       </S.Container>
     </>
@@ -48,7 +50,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
   }
 
-  const tweets = await axios.get('http://localhost:3000/api/social/timeline', {
+  const feed = await axios.get('http://localhost:3000/api/social/timeline', {
     params: {
       userId: session.id
     }
@@ -57,7 +59,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   return {
     props: {
       session,
-      tweets: tweets.data
+      tweets: feed.data[0],
+      suggestions: feed.data[1]
     }
   };
 };

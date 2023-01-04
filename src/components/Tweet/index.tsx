@@ -29,6 +29,8 @@ export default function Tweet({tweet, profile, isRetweet}: Props) {
   const [commentLoading, setCommentLoading] = useState(false);
   const commentRef = useRef<HTMLTextAreaElement | null>(null);
 
+  // criar estado para o tweet para quando o usuario criar um tweet ja aparecer no feed
+
   const handleComments = async () => {
     commentRef.current?.focus();
     setReplies(null);
@@ -87,7 +89,7 @@ export default function Tweet({tweet, profile, isRetweet}: Props) {
           setReplies={setReplies}/>
 
         {
-          !replies || commentLoading ? tweet.tweetId ? tweet.tweetId.replies.length > 0 ? (
+          !replies && !commentLoading ? tweet.tweetId ? tweet.tweetId.replies.length > 0 ? (
             <p
               style={{color: '#BDBDBD', marginTop: 4, cursor: 'pointer'}}
               onClick={() => handleComments()}>

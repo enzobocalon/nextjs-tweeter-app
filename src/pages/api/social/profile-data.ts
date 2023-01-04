@@ -12,7 +12,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const {username} = req.query;
 
   if (!username) {
-    res.status(422).json({
+    res.status(404).json({
       message: 'User not found'
     });
     return;
@@ -26,6 +26,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       options: {sort: {'createdAt': -1},
         populate: {path: 'userId', select: '-password -email'}}
     });
+
+  if (user.length === 0) {
+    res.status(404).json({
+      message: 'User not found'
+    });
+    return;
+  }
 
   const retweets = await Retweet
     .find({userId: user[0]._id})
