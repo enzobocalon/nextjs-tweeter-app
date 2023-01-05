@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 
 import * as S from './styles';
@@ -9,6 +9,7 @@ import Comments from '../Comments';
 
 import { StyledContainer } from '../../styles/global';
 import { AiOutlineRetweet } from 'react-icons/ai';
+import { MdOutlineModeComment } from 'react-icons/md';
 
 import { Tweet as ITweet } from '../../types/Tweet';
 import { User } from '../../types/User';
@@ -38,80 +39,150 @@ export default function Tweet({tweet, profile, isRetweet}: Props) {
 
     await axios.get('/api/social/reply', {
       params: {
-        tweetId: tweet.tweetId ? tweet.tweetId._id : tweet._id
+        tweetId: tweet.tweetId ? tweet.tweetId._id : tweet.repliesTo ? tweet.repliesTo._id : tweet._id
       }
     }).then(response => {
       setReplies(response.data);
       setCommentLoading(false);
     });
-
   };
+
+  useEffect(() => {
+    setTweetData(tweet);
+  }, [tweet]);
+
   return (
     <>
       {
-        isRetweet && (
-          <S.RetweetedContainer>
-            <AiOutlineRetweet color='#828282'/>
-            <span>{profile?.name} Retweeted</span>
-          </S.RetweetedContainer>
+        tweetData.repliesTo ? (
+          <>
+            <S.ActionContainer>
+              <MdOutlineModeComment color='#828282'/>
+              <span>{profile?.name} Replied</span>
+            </S.ActionContainer>
+            <StyledContainer style={{marginBottom: 24}}>
+              <S.Header>
+                <Image src={pfpPlaceholder} width={40} height={40} alt='profile icon' />
+
+                <div>
+                  <p>{tweetData.repliesTo.userId.name}</p>
+                  <span>24 August at 20:43</span>
+                </div>
+              </S.Header>
+
+              <S.TweetContent>
+                <p>{tweetData.repliesTo.content}</p>
+                {
+                  tweetData.repliesTo.media && tweetData.repliesTo.media[0] !== ''  ? <img src={`./uploads/${tweetData.repliesTo.media[0]}`} alt='image'/> : null
+                }
+              </S.TweetContent>
+
+              <TweetStats
+                likes={tweetData.repliesTo.likes}
+                replies={tweetData.repliesTo.replies}
+                retweets={tweetData.repliesTo.retweets}/>
+              <TweetActions
+                tweet={tweetData}
+                setTweetData={setTweetData}
+                handleComments={handleComments}/>
+              <CreateComment
+                refTextarea={commentRef}
+                tweet={tweet}
+                tweetId={tweet.tweetId ? tweet.tweetId._id : tweet._id}
+                replies={replies}
+                setReplies={setReplies}/>
+
+              {
+                !commentLoading ? !replies ? (
+                  <>
+                    <Comments reply={tweetData} />
+                    <p
+                      style={{color: '#BDBDBD', marginTop: 4, cursor: 'pointer'}}
+                      onClick={() => handleComments()}>
+                      Show Replies
+                    </p>
+                  </>
+                ) :
+                  replies.map(reply => {
+                    return (
+                      <Comments key={reply._id} reply={reply} />
+                    );
+                  }) : (
+                  <ClipLoader size={16} color='#2f80ed'/>
+                )
+              }
+            </StyledContainer>
+          </>
+        ) : (
+          <>
+
+            {
+              isRetweet && (
+                <S.ActionContainer>
+                  <AiOutlineRetweet color='#828282'/>
+                  <span>{profile?.name} Retweeted</span>
+                </S.ActionContainer>
+              )
+            }
+            <StyledContainer style={{marginBottom: 24}}>
+              <S.Header>
+                <Image src={pfpPlaceholder} width={40} height={40} alt='profile icon' />
+
+                <div>
+                  <p>{tweetData.userId.name || tweetData.tweetId.userId.name}</p>
+                  <span>24 August at 20:43</span>
+                </div>
+              </S.Header>
+
+              <S.TweetContent>
+                <p>{tweetData.content || tweetData.tweetId.content}</p>
+                {
+                  tweetData.media && tweetData.media[0] !== ''  ? <img src={`./uploads/${tweetData.media[0]}`} alt='image'/> : null
+                }
+              </S.TweetContent>
+
+              <TweetStats
+                likes={tweetData.likes || tweetData.tweetId.likes}
+                replies={tweetData.replies || tweetData.tweetId.replies}
+                retweets={tweetData.retweets || tweetData.tweetId.retweets}/>
+              <TweetActions
+                tweet={tweetData}
+                setTweetData={setTweetData}
+                handleComments={handleComments}/>
+              <CreateComment
+                refTextarea={commentRef}
+                tweet={tweet}
+                tweetId={tweet.tweetId ? tweet.tweetId._id : tweet._id}
+                replies={replies}
+                setReplies={setReplies}/>
+
+              {
+                !replies && !commentLoading ? tweet.tweetId ? tweet.tweetId.replies.length > 0 ? (
+                  <p
+                    style={{color: '#BDBDBD', marginTop: 4, cursor: 'pointer'}}
+                    onClick={() => handleComments()}>
+              Show Replies
+                  </p>
+                ) : null : tweet.replies.length > 0 ? (
+                  <p
+                    style={{color: '#BDBDBD', marginTop: 4, cursor: 'pointer'}}
+                    onClick={() => handleComments()}>
+              Show Replies
+                  </p>
+                ) : null : null
+              }
+
+              {
+                commentLoading ? (
+                  <ClipLoader size={16} color='#2f80ed'/>
+                ) : replies ? replies.map(reply => (
+                  <Comments key={reply._id} reply={reply} />
+                )) : null
+              }
+            </StyledContainer>
+          </>
         )
       }
-      <StyledContainer style={{marginBottom: 24}}>
-        <S.Header>
-          <Image src={pfpPlaceholder} width={40} height={40} alt='profile icon' />
-
-          <div>
-            <p>{tweetData.userId.name || tweetData.tweetId.userId.name}</p>
-            <span>24 August at 20:43</span>
-          </div>
-        </S.Header>
-
-        <S.TweetContent>
-          <p>{tweetData.content || tweetData.tweetId.content}</p>
-          {
-            tweetData.media && tweetData.media[0] !== ''  ? <img src={`./uploads/${tweetData.media[0]}`} alt='image'/> : null
-          }
-        </S.TweetContent>
-
-        <TweetStats
-          likes={tweetData.likes || tweetData.tweetId.likes}
-          replies={tweetData.replies || tweetData.tweetId.replies}
-          retweets={tweetData.retweets || tweetData.tweetId.retweets}/>
-        <TweetActions
-          tweet={tweetData}
-          setTweetData={setTweetData}
-          handleComments={handleComments}/>
-        <CreateComment
-          refTextarea={commentRef}
-          tweet={tweet}
-          tweetId={tweet.tweetId ? tweet.tweetId._id : tweet._id}
-          replies={replies}
-          setReplies={setReplies}/>
-
-        {
-          !replies && !commentLoading ? tweet.tweetId ? tweet.tweetId.replies.length > 0 ? (
-            <p
-              style={{color: '#BDBDBD', marginTop: 4, cursor: 'pointer'}}
-              onClick={() => handleComments()}>
-              Show Replies
-            </p>
-          ) : null : tweet.replies.length > 0 ? (
-            <p
-              style={{color: '#BDBDBD', marginTop: 4, cursor: 'pointer'}}
-              onClick={() => handleComments()}>
-              Show Replies
-            </p>
-          ) : null : null
-        }
-
-        {
-          commentLoading ? (
-            <ClipLoader size={16} color='#2f80ed'/>
-          ) : replies ? replies.map(reply => (
-            <Comments key={reply._id} reply={reply} />
-          )) : null
-        }
-      </StyledContainer>
     </>
   );
 }

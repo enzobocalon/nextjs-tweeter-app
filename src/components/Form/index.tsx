@@ -99,7 +99,7 @@ export default function Form({isRegister}: Props) {
       </S.InputContainer>
       <S.Errors>{handleError(errors.password?.type, 'password')}</S.Errors>
 
-      <Button type='submit'>Login</Button>
+      <Button type='submit'>{isRegister ? 'Register': 'Login'}</Button>
 
     </S.Form>
   );

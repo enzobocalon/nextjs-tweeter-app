@@ -144,7 +144,7 @@ apiRoute.get(async (req, res) => {
   const { tweetId } = req.query;
 
   await dbConnect();
-  const reply = await Reply.find({repliesTo: tweetId}).sort({createdAt: 1}).populate('userId');
+  const reply = await Reply.find({repliesTo: tweetId}).sort({createdAt: 1}).populate({path: 'userId', select: '-email -password'});
   if (!reply) {
     res.status(404).json({
       message: 'Replies not found'

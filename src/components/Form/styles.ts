@@ -14,6 +14,7 @@ export const InputContainer = styled.div`
   gap: 12px;
 
   padding: 1px .875rem;
+  padding-right: 0;
   border: 1px solid #BDBDBD;
   border-radius: 8px;
 `;

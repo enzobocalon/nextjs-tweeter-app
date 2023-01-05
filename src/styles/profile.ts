@@ -37,6 +37,7 @@ export const Feed = styled.div`
   @media (max-width: 768px) {
     width: 95%;
     margin-inline: 1rem;
+    flex-direction: column;
   }
 `;
 

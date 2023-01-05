@@ -24,7 +24,7 @@ export default function TweetActions({tweet, setTweetData, handleComments}: Prop
   const handleLike = async () => {
     await axios.post('/api/social/tweet-status', {
       action: 1,
-      tweetId: tweet.tweetId ? tweet.tweetId._id : tweet._id,
+      tweetId: tweet.tweetId ? tweet.tweetId._id : tweet.repliesTo ? tweet.repliesTo._id : tweet._id,
       userId: session?.id
     }).then((response) => {
       if (response.data.isNew) {
@@ -37,6 +37,18 @@ export default function TweetActions({tweet, setTweetData, handleComments}: Prop
                 ...prev.tweetId,
                 likes: [
                   ...prev.tweetId.likes,
+                  session?.id
+                ]
+              }
+            };
+            return updatedData;
+          } else if (prev.repliesTo) {
+            const updatedData = {
+              ...prev,
+              repliesTo: {
+                ...prev.repliesTo,
+                likes: [
+                  ...prev.repliesTo.likes,
                   session?.id
                 ]
               }
@@ -65,6 +77,15 @@ export default function TweetActions({tweet, setTweetData, handleComments}: Prop
               }
             };
             return updatedData;
+          } else if (prev.repliesTo) {
+            const updatedData = {
+              ...prev,
+              repliesTo: {
+                ...prev.repliesTo,
+                likes: prev.repliesTo.likes.filter(data => data !== session?.id)
+              }
+            };
+            return updatedData;
           } else {
             const updatedData = {
               ...prev,
@@ -80,7 +101,7 @@ export default function TweetActions({tweet, setTweetData, handleComments}: Prop
   const handleRetweet = async () => {
     await axios.post('/api/social/tweet-status', {
       action: 2,
-      tweetId: tweet.tweetId ? tweet.tweetId._id : tweet._id,
+      tweetId: tweet.tweetId ? tweet.tweetId._id : tweet.repliesTo ? tweet.repliesTo._id : tweet._id,
       userId: session?.id
     }).then((response) => {
       if (response.data.isNew) {
@@ -93,6 +114,18 @@ export default function TweetActions({tweet, setTweetData, handleComments}: Prop
                 ...prev.tweetId,
                 retweets: [
                   ...prev.tweetId.retweets,
+                  session?.id
+                ]
+              }
+            };
+            return updatedData;
+          } else if (prev.repliesTo) {
+            const updatedData = {
+              ...prev,
+              repliesTo: {
+                ...prev.repliesTo,
+                retweets: [
+                  ...prev.repliesTo.retweets,
                   session?.id
                 ]
               }
@@ -121,7 +154,17 @@ export default function TweetActions({tweet, setTweetData, handleComments}: Prop
               }
             };
             return updatedData;
-          } else {
+          }  else if (prev.repliesTo) {
+            const updatedData = {
+              ...prev,
+              repliesTo: {
+                ...prev.repliesTo,
+                retweets: prev.repliesTo.retweets.filter(data => data !== session?.id)
+              }
+            };
+            return updatedData;
+          }
+          else {
             const updatedData = {
               ...prev,
               retweets: prev.retweets.filter(data => data !== session?.id)
@@ -137,7 +180,7 @@ export default function TweetActions({tweet, setTweetData, handleComments}: Prop
     await axios.post('/api/social/tweet-status', {
       action: 3,
       userId: session?.id,
-      tweetId: tweet.tweetId ? tweet.tweetId._id : tweet._id
+      tweetId: tweet.tweetId ? tweet.tweetId._id : tweet.repliesTo ? tweet.repliesTo._id : tweet._id,
     }).then((response => {
       if (response.data.isNew) {
         setBookmarks(true);
@@ -148,24 +191,27 @@ export default function TweetActions({tweet, setTweetData, handleComments}: Prop
   };
 
   useEffect(() => {
-    (tweet.likes || tweet.tweetId.likes).map((data) => {
-      if (data === session?.id) {
-        setLike(true);
-      }
-    });
+    (tweet.tweetId ? tweet.tweetId.likes : tweet.repliesTo ? tweet.repliesTo.likes : tweet.likes)
+      .map((data: string) => {
+        if (data === session?.id) {
+          setLike(true);
+        }
+      });
 
-    (tweet.retweets || tweet.tweetId.retweets).map((data) => {
-      if (data === session?.id) {
-        setRetweets(true);
-      }
-    });
+    (tweet.tweetId ? tweet.tweetId.retweets : tweet.repliesTo ? tweet.repliesTo.retweets : tweet.retweets)
+      .map((data: string) => {
+        if (data === session?.id) {
+          setRetweets(true);
+        }
+      });
 
-    (tweet.bookmarks || tweet.tweetId.bookmarks).map((data) => {
-      if (data === session?.id) {
-        setBookmarks(true);
-      }
-    });
-  }, [session]);
+    (tweet.tweetId ? tweet.tweetId.bookmarks : tweet.repliesTo ? tweet.repliesTo.bookmarks : tweet.bookmarks)
+      .map((data: string) => {
+        if (data === session?.id) {
+          setBookmarks(true);
+        }
+      });
+  }, [session, tweet]);
 
   return (
     <S.Container>

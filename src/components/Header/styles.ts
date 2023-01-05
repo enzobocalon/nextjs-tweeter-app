@@ -103,6 +103,7 @@ export const Modal = styled.div<Props>`
   top: 60px;
   right: 0;
   padding: 1rem;
+  z-index: 100;
 
   transition: all .3s ease;
 `;

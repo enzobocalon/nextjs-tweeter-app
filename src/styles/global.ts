@@ -36,6 +36,12 @@ export const GlobalStyle = createGlobalStyle`
   img {
     border-radius: 8px;
   }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+  }
 `;
 
 export const StyledContainer = styled.div`

@@ -35,7 +35,7 @@ export const TweetContent = styled.div`
   }
 `;
 
-export const RetweetedContainer = styled.div`
+export const ActionContainer = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;

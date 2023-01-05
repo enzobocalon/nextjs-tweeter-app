@@ -12,5 +12,6 @@ export interface Tweet {
   bookmarks: (string | ObjectId | undefined)[],
   createdAt: Date,
   media: string[],
-  public: boolean
+  public: boolean,
+  repliesTo: Tweet
 }

@@ -25,4 +25,10 @@ export const Action = styled.div`
     border-radius: 8px;
     transition: all .3s ease;
   }
+
+  @media (max-width: 500px) {
+    span {
+      display: none;
+    }
+  }
 `;

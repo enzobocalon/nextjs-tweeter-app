@@ -11,6 +11,7 @@ import axios from 'axios';
 import { getSession, useSession } from 'next-auth/react';
 import { Tweet as ITweet } from '../types/Tweet';
 import { User } from '../types/User';
+import { useState } from 'react';
 
 interface Props {
   tweets: [
@@ -20,8 +21,9 @@ interface Props {
   isFollowing: boolean;
 }
 
-export default function Profile ({tweets, isFollowing}: Props) {
+export default function Profile ({tweets: tweetsSSR, isFollowing}: Props) {
   const {data: session} = useSession();
+  const [tweets, setTweets] = useState(tweetsSSR);
 
   return (
     <>
@@ -32,11 +34,11 @@ export default function Profile ({tweets, isFollowing}: Props) {
         <S.Content>
           <ProfileInfo profile={tweets[0]} session={session} isFollowing={isFollowing}/>
           <S.Feed>
-            <ProfileTab />
+            <ProfileTab setTweets={setTweets}/>
             <S.TweetsContainer>
               <>
                 {
-                  tweets[1].map(tweet => (
+                  tweets[1].map((tweet: ITweet) => (
                     <Tweet key={tweet._id} tweet={tweet} profile={tweets[0]} isRetweet={tweet.tweetId ? true : false} />
                   ))
                 }
@@ -57,17 +59,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   try {
     const tweets = await axios.get('http://localhost:3000/api/social/profile-data', {
       params: {
-        username: params?.username
+        username: params?.username,
+        action: '0'
       }
     });
 
-    const followingStatus = await axios.get('http://localhost:3000/api/social/follow', {
-      params: {
-        action: 1,
-        username: params?.username,
-        sessionId: session?.id
-      }
-    });
 
     const mergedData = [tweets.data[0], tweets?.data[0].tweets.concat(tweets.data[1])]; // [0] => user, [1] => tweets + retweets
     const sortedData = [
@@ -77,11 +73,27 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       })
     ];
 
+    if (session) {
+      const followingStatus = await axios.get('http://localhost:3000/api/social/follow', {
+        params: {
+          action: 1,
+          username: params?.username,
+          sessionId: session?.id
+        }
+      });
+
+      return {
+        props: {
+          tweets: sortedData,
+          isFollowing: followingStatus.data.isFollowing,
+        }
+      };
+    }
+
     return {
       props: {
         tweets: sortedData,
-        isFollowing: followingStatus.data.isFollowing,
-        notFound: false
+        isFollowing: null,
       }
     };
   } catch (error) {

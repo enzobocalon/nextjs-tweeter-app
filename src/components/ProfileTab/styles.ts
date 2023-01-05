@@ -14,6 +14,10 @@ export const TabContainer = styled.div`
   border-radius: 8px;
   padding: 16px;
   padding-left: 0;
+
+  @media (max-width: 768px) {
+    max-width: 100%;
+  }
 `;
 
 export const TabItem = styled.div<Props>`

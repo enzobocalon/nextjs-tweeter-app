@@ -10,6 +10,7 @@ import { Session } from 'next-auth';
 import axios from 'axios';
 import { useState } from 'react';
 import { ClipLoader } from 'react-spinners';
+import { toast } from 'react-toastify';
 
 interface Props {
   profile: User,
@@ -22,37 +23,42 @@ export default function ProfileInfo({profile, session, isFollowing}: Props) {
   const [loading, setLoading] = useState(false);
   const [profileData, setProfileData] = useState(profile);
   const handleFollow = async () => {
-    setLoading(true);
-    await axios.post('/api/social/follow', {
-      action: 1,
-      profileId: profile._id,
-      userId: session?.id
-    }).then(response => {
-      if (response.data.isNew) {
-        setFollowing(true);
-        setLoading(false);
-        setProfileData(prev => {
-          const updatedData = {
-            ...prev,
-            followed: [
-              ...prev.followed,
-              session?.id
-            ]
-          };
-          return updatedData;
-        });
-      } else {
-        setFollowing(false);
-        setLoading(false);
-        setProfileData(prev => {
-          const updatedData = {
-            ...prev,
-            followed: prev.followed.filter(user => user !== session?.id)
-          };
-          return updatedData;
-        });
-      }
-    });
+    if (session) {
+      setLoading(true);
+      await axios.post('/api/social/follow', {
+        action: 1,
+        profileId: profile._id,
+        userId: session?.id
+      }).then(response => {
+        if (response.data.isNew) {
+          setFollowing(true);
+          setLoading(false);
+          setProfileData(prev => {
+            const updatedData = {
+              ...prev,
+              followed: [
+                ...prev.followed,
+                session?.id
+              ]
+            };
+            return updatedData;
+          });
+        } else {
+          setFollowing(false);
+          setLoading(false);
+          setProfileData(prev => {
+            const updatedData = {
+              ...prev,
+              followed: prev.followed.filter(user => user !== session?.id)
+            };
+            return updatedData;
+          });
+        }
+      });
+    } else {
+      toast.error('You must sign in to follow a user');
+      return;
+    }
   };
 
   return (
