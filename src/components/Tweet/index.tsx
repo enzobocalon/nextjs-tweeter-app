@@ -58,7 +58,7 @@ export default function Tweet({tweet, profile, isRetweet}: Props) {
           <>
             <S.ActionContainer>
               <MdOutlineModeComment color='#828282'/>
-              <span>{profile?.name} Replied</span>
+              <span>{tweetData.userId.name || profile?.name} Replied</span>
             </S.ActionContainer>
             <StyledContainer style={{marginBottom: 24}}>
               <S.Header>

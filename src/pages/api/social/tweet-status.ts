@@ -41,6 +41,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             likes: userId
           }
         });
+
+      await User.findByIdAndUpdate(userId, {
+        $pull: {
+          likes: tweet._id
+        }
+      });
       res.status(200).json({isNew: false});
       return;
     }
@@ -51,6 +57,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           likes: userId
         }
       });
+
+    await User.findByIdAndUpdate(userId, {
+      $push: {
+        likes: tweet._id
+      }
+    });
     res.status(200).json({isNew: true});
     return;
   }

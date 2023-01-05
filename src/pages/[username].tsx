@@ -39,7 +39,7 @@ export default function Profile ({tweets: tweetsSSR, isFollowing}: Props) {
               <>
                 {
                   tweets[1].map((tweet: ITweet) => (
-                    <Tweet key={tweet._id} tweet={tweet} profile={tweets[0]} isRetweet={tweet.tweetId ? true : false} />
+                    <Tweet key={`${tweet._id}${Math.ceil(Math.random() * 10000)}`} tweet={tweet} profile={tweets[0]} isRetweet={tweet.tweetId ? true : false} />
                   ))
                 }
               </>
