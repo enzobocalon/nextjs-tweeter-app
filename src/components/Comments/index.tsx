@@ -3,18 +3,22 @@ import * as S from './styles';
 import pfpPlaceholder from '../../assets/Profile_avatar_placeholder_large.png';
 import Image from 'next/image';
 import { IoMdHeartEmpty } from 'react-icons/io';
+import { SlOptionsVertical } from 'react-icons/sl';
 import { Tweet } from '../../types/Tweet';
 import axios from 'axios';
 import { useSession } from 'next-auth/react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, SetStateAction, Dispatch } from 'react';
+import { MdDelete } from 'react-icons/md';
 
 interface Props {
   reply: Tweet | null
+  setReplies: Dispatch<SetStateAction<Tweet[] | null>>
 }
 
-export default function Comments({reply}: Props) {
+export default function Comments({reply, setReplies}: Props) {
   const {data: session} = useSession();
   const [like, setLike] = useState(false);
+  const [modal, setModal] = useState(false);
   const [replyState, setReplyState] = useState(reply);
 
   if (!reply) {
@@ -63,6 +67,23 @@ export default function Comments({reply}: Props) {
     });
   };
 
+  const handleDelete = async (id: string) => {
+    await axios.delete('/api/social/reply', {
+      params: {
+        replyId: id,
+        userId: session?.id
+      }
+    }).then(() => {
+      setReplies(prev => {
+        if (prev) {
+          return prev.filter(item => item._id !== id);
+        } else {
+          return prev;
+        }
+      });
+    });
+  };
+
   useEffect(() => {
     reply.likes.map(user => {
       if (user === session?.id) {
@@ -80,8 +101,28 @@ export default function Comments({reply}: Props) {
 
         <S.CommentContentContainer>
           <S.CommentHeader>
-            <span>{replyState?.userId.name}</span>
-            <span>24 August at 20:43</span>
+            <div>
+              <span>{replyState?.userId.name}</span>
+              <span>24 August at 20:43</span>
+            </div>
+            <SlOptionsVertical color='#828282' onClick={() => setModal(prev => !prev)}/>
+
+            {
+              modal && (
+                <S.Modal>
+                  {
+                    reply.userId._id === session?.id ? (
+                      <S.ModalContent onClick={() => handleDelete(reply._id)}>
+                        <MdDelete color='#BDBDBD'/>
+                        <span>Delete</span>
+                      </S.ModalContent>
+                    ) : (
+                      <p>No action available</p>
+                    )
+                  }
+                </S.Modal>
+              )
+            }
           </S.CommentHeader>
           <S.Comment>
             <p>{replyState?.content}</p>

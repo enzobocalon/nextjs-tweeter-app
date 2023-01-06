@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, SetStateAction, Dispatch } from 'react';
 import Image from 'next/image';
 
 import * as S from './styles';
@@ -9,7 +9,8 @@ import Comments from '../Comments';
 
 import { StyledContainer } from '../../styles/global';
 import { AiOutlineRetweet } from 'react-icons/ai';
-import { MdOutlineModeComment } from 'react-icons/md';
+import { MdOutlineModeComment, MdDelete } from 'react-icons/md';
+import { SlOptionsVertical } from 'react-icons/sl';
 
 import { Tweet as ITweet } from '../../types/Tweet';
 import { User } from '../../types/User';
@@ -17,20 +18,22 @@ import { User } from '../../types/User';
 import pfpPlaceholder from '../../assets/Profile_avatar_placeholder_large.png';
 import { ClipLoader } from 'react-spinners';
 import axios from 'axios';
+import { useSession } from 'next-auth/react';
 
 interface Props {
   tweet: ITweet,
   profile?: User
   isRetweet?: boolean
+  setTweets: Dispatch<SetStateAction<ITweet[]>>
 }
 
-export default function Tweet({tweet, profile, isRetweet}: Props) {
+export default function Tweet({tweet, profile, isRetweet, setTweets}: Props) {
   const [tweetData, setTweetData] = useState<ITweet>(tweet);
   const [replies, setReplies] = useState<ITweet[] | null>(null);
   const [commentLoading, setCommentLoading] = useState(false);
+  const [modal, setModal] = useState(false);
   const commentRef = useRef<HTMLTextAreaElement | null>(null);
-
-  // criar estado para o tweet para quando o usuario criar um tweet ja aparecer no feed
+  const {data: session} = useSession();
 
   const handleComments = async () => {
     commentRef.current?.focus();
@@ -44,6 +47,18 @@ export default function Tweet({tweet, profile, isRetweet}: Props) {
     }).then(response => {
       setReplies(response.data);
       setCommentLoading(false);
+    });
+  };
+
+  const handleDelete = async (id: string) => {
+    await axios.delete('/api/social/tweet-status', {
+      params: {
+        tweetId: id,
+        userId: session?.id
+      }
+
+    }).then(() => {
+      setTweets(prev => prev.filter(item => item.tweetId ? item.tweetId._id !== id : item.repliesTo ? item.repliesTo._id !== id : item._id !== id));
     });
   };
 
@@ -62,12 +77,32 @@ export default function Tweet({tweet, profile, isRetweet}: Props) {
             </S.ActionContainer>
             <StyledContainer style={{marginBottom: 24}}>
               <S.Header>
-                <Image src={pfpPlaceholder} width={40} height={40} alt='profile icon' />
+                <S.HeaderLeft>
+                  <Image src={pfpPlaceholder} width={40} height={40} alt='profile icon' />
 
-                <div>
-                  <p>{tweetData.repliesTo.userId.name}</p>
-                  <span>24 August at 20:43</span>
-                </div>
+                  <div>
+                    <p>{tweetData.repliesTo.userId.name}</p>
+                    <span>24 August at 20:43</span>
+                  </div>
+                </S.HeaderLeft>
+                {
+                  modal && (
+                    <S.Modal>
+                      {
+                        tweetData.repliesTo.userId._id === session?.id ? (
+                          <S.ModalContent onClick={() => handleDelete(tweetData.repliesTo._id)}>
+                            <MdDelete color='#828282'/>
+                            <span>Delete</span>
+                          </S.ModalContent>
+                        ) : (
+                          <p>No action available</p>
+                        )
+                      }
+                    </S.Modal>
+                  )
+                }
+                <SlOptionsVertical color='#828282' onClick={() => setModal(prev => !prev)}/>
+
               </S.Header>
 
               <S.TweetContent>
@@ -88,14 +123,14 @@ export default function Tweet({tweet, profile, isRetweet}: Props) {
               <CreateComment
                 refTextarea={commentRef}
                 tweet={tweet}
-                tweetId={tweet.tweetId ? tweet.tweetId._id : tweet._id}
+                tweetId={tweet.repliesTo._id}
                 replies={replies}
                 setReplies={setReplies}/>
 
               {
                 !commentLoading ? !replies ? (
                   <>
-                    <Comments reply={tweetData} />
+                    <Comments reply={tweetData} setReplies={setReplies}/>
                     <p
                       style={{color: '#BDBDBD', marginTop: 4, cursor: 'pointer'}}
                       onClick={() => handleComments()}>
@@ -105,7 +140,7 @@ export default function Tweet({tweet, profile, isRetweet}: Props) {
                 ) :
                   replies.map(reply => {
                     return (
-                      <Comments key={reply._id} reply={reply} />
+                      <Comments key={reply._id} reply={reply} setReplies={setReplies}/>
                     );
                   }) : (
                   <ClipLoader size={16} color='#2f80ed'/>
@@ -126,16 +161,38 @@ export default function Tweet({tweet, profile, isRetweet}: Props) {
             }
             <StyledContainer style={{marginBottom: 24}}>
               <S.Header>
-                <Image src={pfpPlaceholder} width={40} height={40} alt='profile icon' />
+                <S.HeaderLeft>
+                  <Image src={pfpPlaceholder} width={40} height={40} alt='profile icon' />
+                  <div>
+                    <p>{tweetData.userId.name || tweetData.tweetId.userId.name}</p>
+                    <span>24 August at 20:43</span>
+                  </div>
+                </S.HeaderLeft>
+                <SlOptionsVertical color='#828282' onClick={() => setModal(prev => !prev)}/>
 
-                <div>
-                  <p>{tweetData.userId.name || tweetData.tweetId.userId.name}</p>
-                  <span>24 August at 20:43</span>
-                </div>
+                {
+                  modal && (
+                    <S.Modal>
+                      {
+                        tweetData.tweetId ? tweetData.tweetId.userId._id === session?.id ? (
+                          <S.ModalContent onClick={() => handleDelete(tweetData.tweetId._id)}>
+                            <MdDelete color='#828282'/>
+                            <span>Delete</span>
+                          </S.ModalContent>
+                        ) : <p>No action available</p> : tweetData.userId._id === session?.id ? (
+                          <S.ModalContent onClick={() => handleDelete(tweetData._id)}>
+                            <MdDelete color='#828282'/>
+                            <span>Delete</span>
+                          </S.ModalContent>
+                        ) : <p>No action available</p>
+                      }
+                    </S.Modal>
+                  )
+                }
               </S.Header>
 
               <S.TweetContent>
-                <p>{tweetData.content || tweetData.tweetId.content}</p>
+                <p>{tweetData.tweetId ? tweetData.tweetId.content : tweetData.content ? tweetData.content : ''}</p>
                 {
                   tweetData.media && tweetData.media[0] !== ''  ? <img src={`./uploads/${tweetData.media[0]}`} alt='image'/> : null
                 }
@@ -176,7 +233,7 @@ export default function Tweet({tweet, profile, isRetweet}: Props) {
                 commentLoading ? (
                   <ClipLoader size={16} color='#2f80ed'/>
                 ) : replies ? replies.map(reply => (
-                  <Comments key={reply._id} reply={reply} />
+                  <Comments key={reply._id} reply={reply} setReplies={setReplies}/>
                 )) : null
               }
             </StyledContainer>

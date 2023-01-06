@@ -156,6 +156,25 @@ apiRoute.get(async (req, res) => {
   return;
 });
 
+apiRoute.delete(async (req, res) => {
+  const {replyId, userId} = req.query;
+  const reply = await Reply.findById(replyId).populate('repliesTo');
+
+  if (reply.userId.valueOf() !== userId) {
+    res.status(422).json({message: 'Cannot delete Reply'});
+    return;
+  }
+
+  await Reply.findByIdAndDelete(replyId);
+  await Tweet.findByIdAndUpdate(reply.repliesTo._id, {
+    $pull: {
+      replies: reply._id
+    }
+  });
+  res.status(201).json({message: 'Reply deleted'});
+  return;
+});
+
 export default apiRoute;
 
 export const config = {

@@ -14,14 +14,12 @@ import { User } from '../types/User';
 import { useState } from 'react';
 
 interface Props {
-  tweets: [
-    User,
-    ITweet[]
-  ],
+  profile: User,
+  tweets: ITweet[]
   isFollowing: boolean;
 }
 
-export default function Profile ({tweets: tweetsSSR, isFollowing}: Props) {
+export default function Profile ({profile, tweets: tweetsSSR, isFollowing}: Props) {
   const {data: session} = useSession();
   const [tweets, setTweets] = useState(tweetsSSR);
 
@@ -32,14 +30,14 @@ export default function Profile ({tweets: tweetsSSR, isFollowing}: Props) {
         <Image src={imagePlaceholder} alt='banner' />
 
         <S.Content>
-          <ProfileInfo profile={tweets[0]} session={session} isFollowing={isFollowing}/>
+          <ProfileInfo profile={profile} session={session} isFollowing={isFollowing}/>
           <S.Feed>
             <ProfileTab setTweets={setTweets}/>
             <S.TweetsContainer>
               <>
                 {
-                  tweets[1].map((tweet: ITweet) => (
-                    <Tweet key={`${tweet._id}${Math.ceil(Math.random() * 10000)}`} tweet={tweet} profile={tweets[0]} isRetweet={tweet.tweetId ? true : false} />
+                  tweets.map((tweet: ITweet) => (
+                    <Tweet key={`${tweet._id}${Math.ceil(Math.random() * 10000)}`} tweet={tweet} profile={profile} isRetweet={tweet.tweetId ? true : false} setTweets={setTweets}/>
                   ))
                 }
               </>
@@ -84,7 +82,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
       return {
         props: {
-          tweets: sortedData,
+          profile: sortedData[0],
+          tweets: sortedData[1],
           isFollowing: followingStatus.data.isFollowing,
         }
       };
@@ -92,7 +91,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     return {
       props: {
-        tweets: sortedData,
+        rofile: sortedData[0],
+        tweets: sortedData[1],
         isFollowing: null,
       }
     };

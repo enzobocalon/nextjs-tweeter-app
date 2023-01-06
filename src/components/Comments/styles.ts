@@ -21,9 +21,20 @@ export const CommentContentContainer = styled.div`
 export const CommentHeader = styled.div`
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
+  position: relative;
 
-  > span:first-of-type {
+  div {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  svg {
+      cursor: pointer;
+  }
+
+  div > span:first-of-type {
     font-family: 'Poppins';
     font-style: normal;
     font-weight: 500;
@@ -34,7 +45,7 @@ export const CommentHeader = styled.div`
     color: #000000;
   }
 
-  > span:last-of-type {
+  div > span:last-of-type {
     font-family: 'Noto Sans';
     font-style: normal;
     font-weight: 500;
@@ -83,5 +94,31 @@ export const Action = styled.div`
 
   &:nth-of-type(2) {
     cursor: auto;
+  }
+`;
+
+export const Modal = styled.div`
+  position: absolute;
+  top: 20px;
+  right: 0;
+  width: 100%;
+  max-width: 300px;
+  background: #FFFFFF;
+  box-shadow: 0px 2px 4px rgb(0 0 0 / 5%);
+  border-radius: 12px;
+  padding: 1rem;
+`;
+
+export const ModalContent = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  cursor: pointer;
+
+  :hover {
+    background-color: #f2f2f2;
+    border-radius: 8px;
   }
 `;

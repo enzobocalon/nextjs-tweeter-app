@@ -6,7 +6,7 @@ import { User } from '../../types/User';
 import * as S from './styles';
 
 interface Props {
-  setTweets: Dispatch<SetStateAction<[User, ITweet[]]>>
+  setTweets: Dispatch<SetStateAction<ITweet[]>>
 }
 
 export default function ProfileTab({setTweets}: Props) {
@@ -32,7 +32,7 @@ export default function ProfileTab({setTweets}: Props) {
         return new Date (b.createdAt).valueOf() - new Date(a.createdAt).valueOf();
       })
     ];
-    setTweets(sortedData);
+    setTweets(sortedData[1]);
   };
 
   return (

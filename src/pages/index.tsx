@@ -9,24 +9,25 @@ import { GetServerSideProps } from 'next/types';
 import axios from 'axios';
 import { Tweet as ITweet } from '../types/Tweet';
 import { User } from '../types/User';
+import { useState } from 'react';
 
 interface Props {
   tweets: ITweet[]
   suggestions: User[]
 }
 
-export default function Home({tweets, suggestions}: Props) {
+export default function Home({tweets: tweetsSSR, suggestions}: Props) {
   const {data: session} = useSession();
+  const [tweets, setTweets] = useState(tweetsSSR);
   return (
     <>
       <Header />
-
       <S.Container>
         <S.MainContent>
-          <CreateTweet session={session}/>
+          <CreateTweet session={session} setTweets={setTweets}/>
           {
             tweets.map(tweet => (
-              <Tweet key={tweet._id} tweet={tweet.tweetId ? tweet.tweetId : tweet} profile={tweet.userId} isRetweet={tweet.tweetId ? true : false}/>
+              <Tweet key={tweet._id} tweet={tweet.tweetId ? tweet.tweetId : tweet} profile={tweet.userId} isRetweet={tweet.tweetId ? true : false} setTweets={setTweets}/>
             ))
           }
 

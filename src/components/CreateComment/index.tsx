@@ -70,7 +70,8 @@ export default function CreateComment({refTextarea, tweetId, replies, setReplies
               {
                 ...response.data,
                 userId: {
-                  name: session?.user?.name
+                  name: session?.user?.name,
+                  _id: session?.id
                 }
               }
             ];
@@ -127,7 +128,7 @@ export default function CreateComment({refTextarea, tweetId, replies, setReplies
             <>
               <S.TextArea placeholder='Tweet your reply' ref={refTextarea} onKeyDown={(e) => handleComment(e)}/>
               <MdImage color='#BDBDBD' size={20} onClick={() => commentMedia.current?.click()}/>
-              <input type='file' hidden ref={commentMedia}/>
+              <input type='file' accept='image/*' hidden ref={commentMedia}/>
             </>
           ) : <p style={{color: '#BDBDBD'}}>Only accounts that {tweet.userId.name || tweet.tweetId.userId.name} follows can Reply.</p>
         }

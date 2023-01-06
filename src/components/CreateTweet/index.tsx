@@ -1,25 +1,28 @@
-import * as S from './styles';
-import { StyledContainer } from '../../styles/global';
-import Image from 'next/image';
-
-import pfpPlaceholder from '../../assets/Profile_avatar_placeholder_large.png';
-import { MdImage, MdGroup } from 'react-icons/md';
-import { IoMdGlobe } from 'react-icons/io';
-import Button from '../Button';
-import { Session } from 'next-auth/core/types';
-import { useRef, useState } from 'react';
 import axios from 'axios';
+import Image from 'next/image';
 import { toast } from 'react-toastify';
+
+import * as S from './styles';
+import Button from '../Button';
+import pfpPlaceholder from '../../assets/Profile_avatar_placeholder_large.png';
+import { MdImage, MdGroup, MdClose } from 'react-icons/md';
+import { IoMdGlobe } from 'react-icons/io';
+import { Session } from 'next-auth/core/types';
+import { Dispatch, SetStateAction, useRef, useState } from 'react';
+import { StyledContainer } from '../../styles/global';
+import { Tweet } from '../../types/Tweet';
 
 interface Props {
   session: Session | null
+  setTweets: Dispatch<SetStateAction<Tweet[]>>
 }
 
-export default function CreateTweet ({session}: Props) {
+export default function CreateTweet ({session, setTweets}: Props) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [publicContent, setPublicContent] = useState(true);
   const content = useRef<HTMLTextAreaElement | null>(null);
   const uploadFile = useRef<HTMLInputElement | null>(null);
+  const [image, setImage] = useState<string | null>(null);
 
   const handlePrivacy = (isPublic: boolean) => {
     setPublicContent(isPublic);
@@ -49,8 +52,24 @@ export default function CreateTweet ({session}: Props) {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
-    });
+    }).then((response) => {
+      setTweets(prev => {
+        const updatedData = [
+          response.data,
+          ...prev
+        ];
+        return updatedData;
+      });
 
+      if (content.current) {
+        content.current.value = '';
+      }
+
+      if (image) {
+        setImage(null);
+      }
+      toast.success('Tweet created');
+    });
   };
   return (
     <StyledContainer style={{marginBottom: 24}}>
@@ -61,12 +80,25 @@ export default function CreateTweet ({session}: Props) {
         <Image src={pfpPlaceholder} alt='pfp' width={40} height={40}/>
         <S.TextAreaContent>
           <S.TextArea placeholder="What's happening?" ref={content}/>
+          {
+            image && (
+              <S.ImagePreview>
+                <img src={image} alt='pfp' />
+                <MdClose color='white' size={20} onClick={() => setImage(null)}/>
+              </S.ImagePreview>
+            )
+          }
 
           <S.Footer>
             <S.LeftFooter>
               <S.FooterItem onClick={() => uploadFile.current?.click()}>
                 <MdImage color='#2f80ed' />
-                <input type={'file'} hidden ref={uploadFile}/>
+                <input
+                  type={'file'}
+                  accept='image/*'
+                  hidden
+                  ref={uploadFile}
+                  onChange={() => setImage(URL.createObjectURL(uploadFile.current?.files![0] as Blob))}/>
               </S.FooterItem>
               <div>
                 <S.FooterItem onClick={() => setIsModalOpen(prev => !prev)}>

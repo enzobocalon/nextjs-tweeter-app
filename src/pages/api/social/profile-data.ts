@@ -72,7 +72,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const filteredMediaUser = {
       ...user[0],
-      tweets: user[0].tweets.filter((tweet: ITweet) => console.log(tweet))
+      tweets: user[0].tweets.filter((tweet: ITweet) => tweet.media[0] !== '')
     };
     const filteredReplies = replies.filter(reply => reply.media[0] !== '');
 

@@ -2,9 +2,11 @@ import styled from 'styled-components';
 
 export const Header = styled.div`
   display: flex;
+  justify-content: space-between;
   gap: 16px;
 
-  > div {
+  position: relative;
+   div {
     > p {
       font-weight: 600;
       font-size: 16px;
@@ -21,6 +23,15 @@ export const Header = styled.div`
       color: #828282;
     }
   }
+
+  > svg {
+    cursor: pointer;
+  }
+`;
+
+export const HeaderLeft = styled.div`
+  display: flex;
+  gap: 16px;
 `;
 
 export const TweetContent = styled.div`
@@ -47,5 +58,31 @@ export const ActionContainer = styled.div`
     line-height: 19px;
     letter-spacing: -0.035em;
     color: #828282;
+  }
+`;
+
+export const Modal = styled.div`
+  position: absolute;
+  top: 20px;
+  right: 0;
+  width: 100%;
+  max-width: 300px;
+  background: #FFFFFF;
+  box-shadow: 0px 2px 4px rgb(0 0 0 / 5%);
+  border-radius: 12px;
+  padding: 1rem;
+`;
+
+export const ModalContent = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  cursor: pointer;
+
+  :hover {
+    background-color: #f2f2f2;
+    border-radius: 8px;
   }
 `;
