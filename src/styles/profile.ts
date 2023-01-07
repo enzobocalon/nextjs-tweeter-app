@@ -42,3 +42,20 @@ export const Feed = styled.div`
 `;
 
 export const TweetsContainer = styled.div``;
+
+export const Overlay = styled.div`
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0,0,0,.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  > div {
+    width: 100%;
+    max-width: 636px;
+  }
+`;

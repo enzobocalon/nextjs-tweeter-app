@@ -37,7 +37,7 @@ export default function SuggestionCard ({suggestion}: Props) {
             ...prev,
             followed: [
               ...prev.followed,
-              session?.id
+              session?.id as unknown as User
             ]
           };
           return updatedData;
@@ -48,7 +48,7 @@ export default function SuggestionCard ({suggestion}: Props) {
         setSuggestionsData(prev => {
           const updatedData = {
             ...prev,
-            followed: prev.followed.filter(user => user !== session?.id)
+            followed: prev.followed.filter(user => user.toString() !== session?.id)
           };
           return updatedData;
         });

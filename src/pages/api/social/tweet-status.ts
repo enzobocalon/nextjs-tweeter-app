@@ -1,4 +1,3 @@
-import { ObjectId } from 'mongodb';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import dbConnect from '../../../lib/mongoose';
 import Bookmark from '../../../models/Bookmark';

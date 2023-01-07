@@ -7,8 +7,8 @@ export interface User {
   banner: string,
   avatar: string,
   bio: string,
-  followed: (string | User | undefined)[],
-  follows: (string | User | undefined)[],
-  likes: string[], // temporary
-  tweets: string[] // temporary
+  followed: (User)[],
+  follows: (User)[],
+  likes: string[],
+  tweets: string[]
 }

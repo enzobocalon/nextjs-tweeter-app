@@ -108,7 +108,7 @@ export default function CreateComment({refTextarea, tweetId, replies, setReplies
           setCanUserReply(true);
         } else {
           tweet.userId.follows.map(user => {
-            if (user === session?.id) {
+            if (user.toString() === session?.id) {
               setCanUserReply(true);
             } else {
               setCanUserReply(false);

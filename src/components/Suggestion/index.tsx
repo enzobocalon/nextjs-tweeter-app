@@ -16,7 +16,7 @@ export default function Suggestion({suggestions}: Props) {
 
       {
         randomSuggestions.length === 0 ? (
-          <p>No user Found</p>
+          <p>No user found</p>
         ) : randomSuggestions.length === 1 ? (
           <SuggestionCard suggestion={randomSuggestions[0]} />
         ) : (

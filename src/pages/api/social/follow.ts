@@ -60,7 +60,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   if (req.method === 'GET') { //get following status
-    const {action, username, sessionId} = req.query;
+    const {username, sessionId} = req.query;
     const user = await User
       .find({_id: sessionId})
       .select('-password')
@@ -74,10 +74,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const isFollowing = user[0].follows.filter((user: IUser) => user.username === username);
     if (isFollowing.length === 0) {
-      res.status(201).json({isFollowing: false});
+      res.status(201).json({isFollowing: false, user});
       return;
     }
-    res.status(201).json({isFollowing: true});
+    res.status(201).json({isFollowing: true, user});
     return;
   }
 }

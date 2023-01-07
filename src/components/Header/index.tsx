@@ -31,10 +31,12 @@ export default function Header() {
           <span>Explore</span>
           <IoMdCompass color='#828282' size={20}/>
         </S.Menu>
-        <S.Menu>
-          <span>Bookmarks</span>
-          <MdBookmark color='#828282' size={20}/>
-        </S.Menu>
+        <Link href={'/bookmarks'}>
+          <S.Menu>
+            <span>Bookmarks</span>
+            <MdBookmark color='#828282' size={20}/>
+          </S.Menu>
+        </Link>
       </S.MenuContainer>
 
       <S.ProfileContainer onClick={() => setIsModalOpen(prev => !prev)}>

@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { useState, useRef, useEffect, SetStateAction, Dispatch } from 'react';
 import Image from 'next/image';
 
@@ -17,17 +18,18 @@ import { User } from '../../types/User';
 
 import pfpPlaceholder from '../../assets/Profile_avatar_placeholder_large.png';
 import { ClipLoader } from 'react-spinners';
-import axios from 'axios';
 import { useSession } from 'next-auth/react';
+import { toast } from 'react-toastify';
 
 interface Props {
   tweet: ITweet,
   profile?: User
   isRetweet?: boolean
   setTweets: Dispatch<SetStateAction<ITweet[]>>
+  isBookMarkPage?: boolean
 }
 
-export default function Tweet({tweet, profile, isRetweet, setTweets}: Props) {
+export default function Tweet({tweet, profile, isRetweet, setTweets, isBookMarkPage}: Props) {
   const [tweetData, setTweetData] = useState<ITweet>(tweet);
   const [replies, setReplies] = useState<ITweet[] | null>(null);
   const [commentLoading, setCommentLoading] = useState(false);
@@ -60,6 +62,14 @@ export default function Tweet({tweet, profile, isRetweet, setTweets}: Props) {
     }).then(() => {
       setTweets(prev => prev.filter(item => item.tweetId ? item.tweetId._id !== id : item.repliesTo ? item.repliesTo._id !== id : item._id !== id));
     });
+  };
+
+  const handleBookmark = () => {
+    if (!isBookMarkPage) {
+      return;
+    }
+    setTweets(prev => prev.filter(item => item._id !== tweetData._id));
+    toast.success('Tweet removed from bookmarks');
   };
 
   useEffect(() => {
@@ -205,7 +215,8 @@ export default function Tweet({tweet, profile, isRetweet, setTweets}: Props) {
               <TweetActions
                 tweet={tweetData}
                 setTweetData={setTweetData}
-                handleComments={handleComments}/>
+                handleComments={handleComments}
+                handleBookmark={handleBookmark}/>
               <CreateComment
                 refTextarea={commentRef}
                 tweet={tweet}
@@ -218,13 +229,13 @@ export default function Tweet({tweet, profile, isRetweet, setTweets}: Props) {
                   <p
                     style={{color: '#BDBDBD', marginTop: 4, cursor: 'pointer'}}
                     onClick={() => handleComments()}>
-              Show Replies
+                    Show Replies
                   </p>
                 ) : null : tweet.replies.length > 0 ? (
                   <p
                     style={{color: '#BDBDBD', marginTop: 4, cursor: 'pointer'}}
                     onClick={() => handleComments()}>
-              Show Replies
+                    Show Replies
                   </p>
                 ) : null : null
               }

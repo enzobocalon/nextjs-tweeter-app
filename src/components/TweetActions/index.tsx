@@ -13,9 +13,10 @@ interface Props {
   tweet: Tweet,
   setTweetData: Dispatch<SetStateAction<Tweet>>
   handleComments: () => void
+  handleBookmark?: () => void
 }
 
-export default function TweetActions({tweet, setTweetData, handleComments}: Props) {
+export default function TweetActions({tweet, setTweetData, handleComments, handleBookmark: handleBookmarkPage}: Props) {
   const [like, setLike] = useState(false);
   const [retweets, setRetweets] = useState(false);
   const [bookmarks, setBookmarks] = useState(false);
@@ -187,6 +188,7 @@ export default function TweetActions({tweet, setTweetData, handleComments}: Prop
       } else {
         setBookmarks(false);
       }
+      handleBookmarkPage!();
     }));
   };
 

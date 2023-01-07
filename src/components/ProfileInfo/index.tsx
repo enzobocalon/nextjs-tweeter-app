@@ -8,7 +8,7 @@ import Button from '../Button';
 import { User } from '../../types/User';
 import { Session } from 'next-auth';
 import axios from 'axios';
-import { useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { ClipLoader } from 'react-spinners';
 import { toast } from 'react-toastify';
 
@@ -16,12 +16,20 @@ interface Props {
   profile: User,
   session: Session | null,
   isFollowing: boolean
+  setFollowModal: Dispatch<SetStateAction<boolean>>
+  setIsFollowers: Dispatch<SetStateAction<boolean>>
 }
 
-export default function ProfileInfo({profile, session, isFollowing}: Props) {
+export default function ProfileInfo({profile, session, isFollowing, setFollowModal, setIsFollowers}: Props) {
   const [following, setFollowing] = useState(isFollowing);
   const [loading, setLoading] = useState(false);
   const [profileData, setProfileData] = useState(profile);
+
+  const handleFollowModal = (item: boolean) => {
+    setFollowModal(true);
+    setIsFollowers(item);
+  };
+
   const handleFollow = async () => {
     if (session) {
       setLoading(true);
@@ -38,7 +46,7 @@ export default function ProfileInfo({profile, session, isFollowing}: Props) {
               ...prev,
               followed: [
                 ...prev.followed,
-                session?.id
+                session?.id as unknown as User
               ]
             };
             return updatedData;
@@ -49,7 +57,7 @@ export default function ProfileInfo({profile, session, isFollowing}: Props) {
           setProfileData(prev => {
             const updatedData = {
               ...prev,
-              followed: prev.followed.filter(user => user !== session?.id)
+              followed: prev.followed.filter(user => user.toString() !== session?.id)
             };
             return updatedData;
           });
@@ -74,8 +82,8 @@ export default function ProfileInfo({profile, session, isFollowing}: Props) {
               <S.PIHeaderLeft>
                 <h2>{profileData.name}</h2>
                 <div>
-                  <p>{profileData.follows.length} <span>Following</span></p>
-                  <p>{profileData.followed.length} <span>Followers</span></p>
+                  <p onClick={() => handleFollowModal(false)}>{profileData.follows.length} <span>Following</span></p>
+                  <p onClick={() => handleFollowModal(true)}>{profileData.followed.length} <span>Followers</span></p>
                 </div>
               </S.PIHeaderLeft>
             </S.PIHeader>

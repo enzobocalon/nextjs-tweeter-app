@@ -99,6 +99,7 @@ export const PIHeaderLeft = styled.div`
     gap: 12px;
 
     > p {
+      cursor: pointer;
       font-family: 'Poppins';
       font-style: normal;
       font-weight: 600;

@@ -12,16 +12,25 @@ import { getSession, useSession } from 'next-auth/react';
 import { Tweet as ITweet } from '../types/Tweet';
 import { User } from '../types/User';
 import { useState } from 'react';
+import FollowModal from '../components/FollowModal';
 
 interface Props {
   profile: User,
   tweets: ITweet[]
   isFollowing: boolean;
+  user: User[]
 }
 
 export default function Profile ({profile, tweets: tweetsSSR, isFollowing}: Props) {
   const {data: session} = useSession();
   const [tweets, setTweets] = useState(tweetsSSR);
+  const [followModal, setFollowModal] = useState(false);
+  const [isFollowers, setIsFollowers] = useState(false);
+
+  const handleModalClose = () => {
+    setIsFollowers(false);
+    setFollowModal(false);
+  };
 
   return (
     <>
@@ -30,7 +39,7 @@ export default function Profile ({profile, tweets: tweetsSSR, isFollowing}: Prop
         <Image src={imagePlaceholder} alt='banner' />
 
         <S.Content>
-          <ProfileInfo profile={profile} session={session} isFollowing={isFollowing}/>
+          <ProfileInfo profile={profile} session={session} isFollowing={isFollowing} setFollowModal={setFollowModal} setIsFollowers={setIsFollowers}/>
           <S.Feed>
             <ProfileTab setTweets={setTweets}/>
             <S.TweetsContainer>
@@ -45,6 +54,13 @@ export default function Profile ({profile, tweets: tweetsSSR, isFollowing}: Prop
           </S.Feed>
         </S.Content>
       </S.Container>
+      {
+        followModal && (
+          <S.Overlay onClick={handleModalClose}>
+            <FollowModal profile={profile} isFollower={isFollowers}/>
+          </S.Overlay>
+        )
+      }
     </>
   );
 }
@@ -62,7 +78,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       }
     });
 
-
     const mergedData = [tweets.data[0], tweets?.data[0].tweets.concat(tweets.data[1])]; // [0] => user, [1] => tweets + retweets
     const sortedData = [
       mergedData[0],
@@ -72,7 +87,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     ];
 
     if (session) {
-      const followingStatus = await axios.get('http://localhost:3000/api/social/follow', {
+      const follows = await axios.get('http://localhost:3000/api/social/follow', {
         params: {
           action: 1,
           username: params?.username,
@@ -84,16 +99,18 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         props: {
           profile: sortedData[0],
           tweets: sortedData[1],
-          isFollowing: followingStatus.data.isFollowing,
+          isFollowing: follows.data.isFollowing,
+          user: follows.data.user
         }
       };
     }
 
     return {
       props: {
-        rofile: sortedData[0],
+        profile: sortedData[0],
         tweets: sortedData[1],
         isFollowing: null,
+        user: null
       }
     };
   } catch (error) {
