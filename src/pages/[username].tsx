@@ -21,7 +21,7 @@ interface Props {
   user: User[]
 }
 
-export default function Profile ({profile, tweets: tweetsSSR, isFollowing}: Props) {
+export default function Profile ({profile, tweets: tweetsSSR, isFollowing, user}: Props) {
   const {data: session} = useSession();
   const [tweets, setTweets] = useState(tweetsSSR);
   const [followModal, setFollowModal] = useState(false);
@@ -57,7 +57,7 @@ export default function Profile ({profile, tweets: tweetsSSR, isFollowing}: Prop
       {
         followModal && (
           <S.Overlay onClick={handleModalClose}>
-            <FollowModal profile={profile} isFollower={isFollowers}/>
+            <FollowModal profile={profile} isFollower={isFollowers} user={user}/>
           </S.Overlay>
         )
       }
