@@ -68,16 +68,18 @@ export default function Account({userItem, user}: Props) {
           </div>
         </S.ProfileLeft>
         {
-          userItem._id !== session?.id && isFollowing ? (
-            <Button onClick={handleFollow}>
-              <MdPerson />
-                Following
-            </Button>
-          ) : (
-            <Button onClick={handleFollow}>
-              <MdPersonAdd />
-                Follow
-            </Button>
+          userItem._id !== session?.id && (
+            isFollowing ? (
+              <Button onClick={handleFollow}>
+                <MdPerson />
+                  Following
+              </Button>
+            ) : (
+              <Button onClick={handleFollow}>
+                <MdPersonAdd />
+                  Follow
+              </Button>
+            )
           )
         }
       </S.Profile>
