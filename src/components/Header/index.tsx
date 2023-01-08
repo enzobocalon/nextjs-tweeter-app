@@ -48,12 +48,12 @@ export default function Header() {
               <MdOutlineKeyboardArrowDown/>
 
               <S.Modal showing={isModalOpen} onClick={(e) => e.stopPropagation()}>
-                <Link href={`/${session?.username}`}>
+                <a href={`/${session?.username}`}>
                   <S.ModalItem>
                     <FaUserCircle size={20} color='#4F4F4F'/>
                     <span>My Profile</span>
                   </S.ModalItem>
-                </Link>
+                </a>
                 <S.ModalItem>
                   <MdOutlineGroup size={20} color='#4F4F4F'/>
                   <span>Group Chat</span>

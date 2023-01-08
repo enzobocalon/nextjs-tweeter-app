@@ -62,6 +62,7 @@ export default function Tweet({tweet, profile, isRetweet, setTweets, isBookMarkP
 
     }).then(() => {
       setTweets(prev => prev.filter(item => item.tweetId ? item.tweetId._id !== id : item.repliesTo ? item.repliesTo._id !== id : item._id !== id));
+      toast.success('Tweet deleted');
     });
   };
 

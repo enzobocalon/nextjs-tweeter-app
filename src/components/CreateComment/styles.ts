@@ -27,7 +27,7 @@ export const TextAreaContent = styled.div`
   line-height: 19px;
   letter-spacing: -0.035em;
 
-  > svg {
+  svg {
     cursor: pointer;
   }
 

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useState, useEffect, Dispatch, SetStateAction, MutableRefObject } from 'react';
+import { useState, useEffect, Dispatch, SetStateAction } from 'react';
 
 import * as S from './styles';
 
@@ -8,6 +8,7 @@ import { AiOutlineRetweet } from 'react-icons/ai';
 import { IoMdHeartEmpty } from 'react-icons/io';
 import { Tweet } from '../../types/Tweet';
 import { useSession } from 'next-auth/react';
+import { toast } from 'react-toastify';
 
 interface Props {
   tweet: Tweet,
@@ -184,8 +185,10 @@ export default function TweetActions({tweet, setTweetData, handleComments, handl
       tweetId: tweet.tweetId ? tweet.tweetId._id : tweet.repliesTo ? tweet.repliesTo._id : tweet._id,
     }).then((response => {
       if (response.data.isNew) {
+        toast.success('Added to bookmarks');
         setBookmarks(true);
       } else {
+        toast.success('Removed from bookmarks');
         setBookmarks(false);
       }
       handleBookmarkPage!();

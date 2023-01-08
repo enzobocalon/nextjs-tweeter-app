@@ -97,7 +97,7 @@ export default function Comments({reply, setReplies}: Props) {
   }, [session]);
   return (
     <S.Container>
-      <Image src={replyState?.userId.avatar ? `/uploads/${replyState.userId.avatar}` : pfpPlaceholder.src} width={40} height={40} alt='icon' />
+      <img src={replyState?.userId.avatar ? `/uploads/${replyState.userId.avatar}` : pfpPlaceholder.src} width={40} height={40} alt='icon' />
 
       <S.CommentContent>
 

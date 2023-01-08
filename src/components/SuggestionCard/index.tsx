@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
-import Image from 'next/image';
 import * as S from './styles';
 
 import pfpPlaceholder from '../../assets/Profile_avatar_placeholder_large.png';
@@ -11,7 +10,6 @@ import Button from '../Button';
 import { MdPerson, MdPersonAdd } from 'react-icons/md';
 import { User } from '../../types/User';
 import { ClipLoader } from 'react-spinners';
-import Link from 'next/link';
 
 interface Props {
   suggestion: User
@@ -61,11 +59,11 @@ export default function SuggestionCard ({suggestion}: Props) {
     <S.Container>
       <S.Header>
         <div>
-          <Image src={pfpPlaceholder} width={40} height={40} alt='icon' />
+          <img src={suggestion.avatar ? `/uploads/${suggestion.avatar}` : pfpPlaceholder.src} width={40} height={40} alt='icon' />
           <div>
-            <Link href={`/${suggestion.username}`}>
+            <a href={`/${suggestion.username}`}>
               <p>{suggestion.name}</p>
-            </Link>
+            </a>
             <span>{suggestionsData.followed.length} followers</span>
           </div>
         </div>
@@ -91,7 +89,7 @@ export default function SuggestionCard ({suggestion}: Props) {
 
       <S.Content>
         <p>{suggestion.bio ? suggestion.bio : 'No bio provided'}</p>
-        <Image src={suggestion.banner ? suggestion.banner : imagePlaceholder} alt='image' />
+        <img src={suggestion.banner ? `/uploads/${suggestion.banner}` : imagePlaceholder.src} alt='image' />
       </S.Content>
 
       <hr style={{marginTop: 24}}/>
