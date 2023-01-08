@@ -7,15 +7,17 @@ export const Header = styled.div`
 
   position: relative;
    div {
-    > p {
+    a {
+      > p {
       font-weight: 600;
       font-size: 16px;
       line-height: 22px;
       letter-spacing: -0.035em;
       color: #333333;
     }
+  }
 
-  > span {
+  span {
       font-weight: 500;
       font-size: 12px;
       line-height: 16px;

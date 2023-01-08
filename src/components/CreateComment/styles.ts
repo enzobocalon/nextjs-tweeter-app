@@ -1,13 +1,13 @@
 import styled from 'styled-components';
 
 interface Props {
-  onImage: string | null
+  imageExists: string | null
 }
 
 export const Container = styled.div<Props>`
   padding: 10px 1rem;
   display: flex;
-  align-items: ${({onImage}) => onImage ? 'flex-start' : 'center'};
+  align-items: ${({imageExists}) => imageExists ? 'flex-start' : 'center'};
   gap: 1rem;
 
   border-bottom: 1px solid #F2F2F2;

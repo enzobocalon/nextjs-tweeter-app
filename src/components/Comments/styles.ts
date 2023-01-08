@@ -34,7 +34,7 @@ export const CommentHeader = styled.div`
       cursor: pointer;
   }
 
-  div > span:first-of-type {
+  div > a > span:first-of-type {
     font-family: 'Poppins';
     font-style: normal;
     font-weight: 500;

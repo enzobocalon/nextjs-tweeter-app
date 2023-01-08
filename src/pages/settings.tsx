@@ -13,6 +13,7 @@ import Button from '../components/Button';
 import { useState, useRef, useEffect } from 'react';
 import { MdDone, MdUpload } from 'react-icons/md';
 import { User } from '../types/User';
+import { toast } from 'react-toastify';
 
 interface Props {
   user: User
@@ -78,6 +79,9 @@ export default function Settings({user}: Props) {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
+    }).then(() => {
+      toast.success('Profile updated.');
+      window.location.reload();
     });
   };
 
@@ -161,6 +165,7 @@ export default function Settings({user}: Props) {
                 <>
                   <S.Data>
                     <span>Avatar</span>
+                    <input type='file' hidden ref={avatar} onChange={() => setUploadAvatar(true)}/>
 
                     {
                       uploadAvatar ? (
@@ -174,13 +179,14 @@ export default function Settings({user}: Props) {
                             <MdUpload />
                             <span>Upload file</span>
                           </div>
-                          <input type='file' hidden ref={avatar} />
                         </>
                       )
                     }
                   </S.Data>
                   <S.Data>
                     <span>Banner</span>
+                    <input type='file' hidden ref={banner} onChange={() => setUploadBanner(true)}/>
+
                     {
                       uploadBanner ? (
                         <div>
@@ -193,7 +199,6 @@ export default function Settings({user}: Props) {
                             <MdUpload />
                             <span>Upload file</span>
                           </div>
-                          <input type='file' hidden ref={banner}/>
                         </>
                       )
                     }

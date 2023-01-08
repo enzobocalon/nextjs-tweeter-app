@@ -9,6 +9,8 @@ import axios from 'axios';
 import { useSession } from 'next-auth/react';
 import { useState, useEffect, SetStateAction, Dispatch } from 'react';
 import { MdDelete } from 'react-icons/md';
+import Link from 'next/link';
+import dateFormatter from '../../utils/dateFormatter';
 
 interface Props {
   reply: Tweet | null
@@ -102,8 +104,10 @@ export default function Comments({reply, setReplies}: Props) {
         <S.CommentContentContainer>
           <S.CommentHeader>
             <div>
-              <span>{replyState?.userId.name}</span>
-              <span>24 August at 20:43</span>
+              <Link href={`/${replyState?.userId.username}`}>
+                <span>{replyState?.userId.name}</span>
+              </Link>
+              <span>{dateFormatter(new Date(`${replyState?.createdAt}`))}</span>
             </div>
             <SlOptionsVertical color='#828282' onClick={() => setModal(prev => !prev)}/>
 

@@ -125,7 +125,7 @@ export default function CreateComment({refTextarea, tweetId, replies, setReplies
   }, [session]);
 
   return (
-    <S.Container onImage={image}>
+    <S.Container imageExists={image}>
       <img src={session?.avatar ? `/uploads/${session?.avatar}` : pfpPlaceholder.src} width={40} height={40} alt='pfp' />
       <S.TextAreaContent>
         {

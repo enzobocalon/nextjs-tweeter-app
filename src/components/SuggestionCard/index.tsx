@@ -11,6 +11,7 @@ import Button from '../Button';
 import { MdPerson, MdPersonAdd } from 'react-icons/md';
 import { User } from '../../types/User';
 import { ClipLoader } from 'react-spinners';
+import Link from 'next/link';
 
 interface Props {
   suggestion: User
@@ -62,7 +63,9 @@ export default function SuggestionCard ({suggestion}: Props) {
         <div>
           <Image src={pfpPlaceholder} width={40} height={40} alt='icon' />
           <div>
-            <p>{suggestion.name}</p>
+            <Link href={`/${suggestion.username}`}>
+              <p>{suggestion.name}</p>
+            </Link>
             <span>{suggestionsData.followed.length} followers</span>
           </div>
         </div>

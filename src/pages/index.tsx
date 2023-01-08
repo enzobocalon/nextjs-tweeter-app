@@ -10,11 +10,14 @@ import axios from 'axios';
 import { Tweet as ITweet } from '../types/Tweet';
 import { User } from '../types/User';
 import { useState } from 'react';
+import dateFormatter from '../utils/dateFormatter';
 
 interface Props {
   tweets: ITweet[]
   suggestions: User[]
 }
+
+dateFormatter(new Date('2023-01-08T18:21:36.806+00:00'));
 
 export default function Home({tweets: tweetsSSR, suggestions}: Props) {
   const {data: session} = useSession();

@@ -19,6 +19,8 @@ import pfpPlaceholder from '../../assets/Profile_avatar_placeholder_large.png';
 import { ClipLoader } from 'react-spinners';
 import { useSession } from 'next-auth/react';
 import { toast } from 'react-toastify';
+import Link from 'next/link';
+import dateFormatter from '../../utils/dateFormatter';
 
 interface Props {
   tweet: ITweet,
@@ -90,8 +92,10 @@ export default function Tweet({tweet, profile, isRetweet, setTweets, isBookMarkP
                   <img src={tweetData.repliesTo.userId.avatar ? `/uploads/${tweetData.repliesTo.userId.avatar}` : pfpPlaceholder.src} width={40} height={40} alt='profile icon' />
 
                   <div>
-                    <p>{tweetData.repliesTo.userId.name}</p>
-                    <span>24 August at 20:43</span>
+                    <Link href={`/${tweetData.repliesTo.userId.username}`}>
+                      <p>{tweetData.repliesTo.userId.name}</p>
+                    </Link>
+                    <span>{dateFormatter(new Date(`${tweetData.repliesTo.createdAt}`))}</span>
                   </div>
                 </S.HeaderLeft>
                 {
@@ -173,8 +177,10 @@ export default function Tweet({tweet, profile, isRetweet, setTweets, isBookMarkP
                 <S.HeaderLeft>
                   <img src={tweetData.tweetId ? tweetData.tweetId.userId.avatar ? `/uploads/${tweetData.tweetId.userId.avatar}` : pfpPlaceholder.src : tweetData.userId.avatar ? `/uploads/${tweetData.userId.avatar}` : pfpPlaceholder.src} width={40} height={40} alt='profile icon' />
                   <div>
-                    <p>{tweetData.userId.name || tweetData.tweetId.userId.name}</p>
-                    <span>24 August at 20:43</span>
+                    <Link href={tweetData.tweetId ? `/${tweetData.tweetId.userId.username}` : `/${tweetData.userId.username}`}>
+                      <p>{tweetData.userId.name || tweetData.tweetId.userId.name}</p>
+                      <span>{dateFormatter(new Date(`${tweetData.tweetId ? tweetData.tweetId.createdAt : tweetData.createdAt}`))}</span>
+                    </Link>
                   </div>
                 </S.HeaderLeft>
                 <SlOptionsVertical color='#828282' onClick={() => setModal(prev => !prev)}/>

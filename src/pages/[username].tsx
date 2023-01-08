@@ -1,5 +1,4 @@
 import { GetServerSideProps } from 'next';
-import Image from 'next/image';
 import Header from '../components/Header';
 import * as S from '../styles/profile';
 
@@ -36,7 +35,7 @@ export default function Profile ({profile, tweets: tweetsSSR, isFollowing, user}
     <>
       <Header />
       <S.Container>
-        <Image src={imagePlaceholder} alt='banner' />
+        <img src={profile.banner ? `/uploads/${profile.banner}` : imagePlaceholder.src} alt='banner' />
 
         <S.Content>
           <ProfileInfo profile={profile} session={session} isFollowing={isFollowing} setFollowModal={setFollowModal} setIsFollowers={setIsFollowers}/>

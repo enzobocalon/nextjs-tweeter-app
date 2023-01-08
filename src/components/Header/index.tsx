@@ -58,10 +58,12 @@ export default function Header() {
                   <MdOutlineGroup size={20} color='#4F4F4F'/>
                   <span>Group Chat</span>
                 </S.ModalItem>
-                <S.ModalItem>
-                  <MdSettings size={20} color='#4F4F4F'/>
-                  <span>Settings</span>
-                </S.ModalItem>
+                <Link href={'/settings'}>
+                  <S.ModalItem>
+                    <MdSettings size={20} color='#4F4F4F'/>
+                    <span>Settings</span>
+                  </S.ModalItem>
+                </Link>
                 <hr />
                 <S.ModalItem onClick={() => signOut({callbackUrl: '/login'})}>
                   <MdLogout size={20} color='#EB5757'/>
