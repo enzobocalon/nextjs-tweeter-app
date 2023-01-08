@@ -76,6 +76,7 @@ export const Modal = styled.div<Props>`
   opacity: ${({showing}) => showing ? '1' : '0'};
   pointer-events: ${({showing}) => showing ? 'all' : 'none'};
   transition: all .3s ease;
+  z-index: 100;
 
   p {
     font-style: normal;

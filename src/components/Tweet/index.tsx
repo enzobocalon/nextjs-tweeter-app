@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { useState, useRef, useEffect, SetStateAction, Dispatch } from 'react';
-import Image from 'next/image';
 
 import * as S from './styles';
 import TweetActions from '../TweetActions';
@@ -88,7 +87,7 @@ export default function Tweet({tweet, profile, isRetweet, setTweets, isBookMarkP
             <StyledContainer style={{marginBottom: 24}}>
               <S.Header>
                 <S.HeaderLeft>
-                  <Image src={pfpPlaceholder} width={40} height={40} alt='profile icon' />
+                  <img src={tweetData.repliesTo.userId.avatar ? `/uploads/${tweetData.repliesTo.userId.avatar}` : pfpPlaceholder.src} width={40} height={40} alt='profile icon' />
 
                   <div>
                     <p>{tweetData.repliesTo.userId.name}</p>
@@ -172,7 +171,7 @@ export default function Tweet({tweet, profile, isRetweet, setTweets, isBookMarkP
             <StyledContainer style={{marginBottom: 24}}>
               <S.Header>
                 <S.HeaderLeft>
-                  <Image src={pfpPlaceholder} width={40} height={40} alt='profile icon' />
+                  <img src={tweetData.tweetId ? tweetData.tweetId.userId.avatar ? `/uploads/${tweetData.tweetId.userId.avatar}` : pfpPlaceholder.src : tweetData.userId.avatar ? `/uploads/${tweetData.userId.avatar}` : pfpPlaceholder.src} width={40} height={40} alt='profile icon' />
                   <div>
                     <p>{tweetData.userId.name || tweetData.tweetId.userId.name}</p>
                     <span>24 August at 20:43</span>

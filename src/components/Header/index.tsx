@@ -43,7 +43,7 @@ export default function Header() {
         {
           session ? (
             <>
-              <Image src={pfpPlaceholder} width={32} height={32} alt='profile icon' />
+              <img src={session.avatar ? `/uploads/${session.avatar}` : pfpPlaceholder.src} width={32} height={32} alt='profile icon' />
               <span>{session?.user?.name}</span>
               <MdOutlineKeyboardArrowDown/>
 

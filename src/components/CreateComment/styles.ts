@@ -1,17 +1,19 @@
 import styled from 'styled-components';
 
-export const Container = styled.div`
+interface Props {
+  onImage: string | null
+}
+
+export const Container = styled.div<Props>`
   padding: 10px 1rem;
   display: flex;
-  align-items: center;
+  align-items: ${({onImage}) => onImage ? 'flex-start' : 'center'};
   gap: 1rem;
 
   border-bottom: 1px solid #F2F2F2;
 `;
 
 export const TextAreaContent = styled.div`
-  display: flex;
-  align-items: center;
   padding: .5rem;
 
   background: #FAFAFA;
@@ -27,6 +29,12 @@ export const TextAreaContent = styled.div`
 
   > svg {
     cursor: pointer;
+  }
+
+  > div {
+    width: 100%;
+    display: flex;
+    align-items: center;
   }
 `;
 
@@ -68,4 +76,37 @@ export const TextArea = styled.textarea`
     color: #bdbdbd;
   }
 
+`;
+
+export const ImagePreview = styled.div`
+  width: 100%;
+  position: relative;
+
+  img {
+    width: 100%;
+    max-width: 500px;
+    height: 100%;
+    max-height: 500px;
+    object-fit: cover;
+  }
+
+  svg {
+    position: absolute;
+    left: 12px;
+    top: 12px;
+    cursor: pointer;
+    z-index: 50;
+  }
+
+  ::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    max-width: 500px;
+    height: 100%;
+    max-height: 500px;
+    background-color: rgba(0, 0, 0, .2);
+    left: 0;
+    border-radius: 8px;
+  }
 `;

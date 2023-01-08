@@ -11,6 +11,7 @@ import axios from 'axios';
 import { Dispatch, SetStateAction, useState } from 'react';
 import { ClipLoader } from 'react-spinners';
 import { toast } from 'react-toastify';
+import Link from 'next/link';
 
 interface Props {
   profile: User,
@@ -73,7 +74,7 @@ export default function ProfileInfo({profile, session, isFollowing, setFollowMod
     <S.Container>
       <StyledContainer>
         <S.ImageContainer>
-          <Image src={pfp} width={150} height={150} alt='pfp' />
+          <img src={profile.avatar ? `/uploads/${profile.avatar}` : pfp.src} width={150} height={150} alt='pfp' />
         </S.ImageContainer>
 
         <S.ProfileInformation>
@@ -92,10 +93,12 @@ export default function ProfileInfo({profile, session, isFollowing, setFollowMod
 
           {
             profile.username === session?.username ? (
-              <Button>
-                <MdEdit />
+              <Link href={'/settings'}>
+                <Button>
+                  <MdEdit />
                 Edit
-              </Button>
+                </Button>
+              </Link>
             ) : (
               <Button onClick={() => handleFollow()}>
                 {

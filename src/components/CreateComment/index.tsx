@@ -2,7 +2,7 @@ import * as S from './styles';
 
 import pfpPlaceholder from '../../assets/Profile_avatar_placeholder_large.png';
 import Image from 'next/image';
-import { MdImage } from 'react-icons/md';
+import { MdClose, MdImage } from 'react-icons/md';
 
 import React, { MutableRefObject, useState, useRef, Dispatch, SetStateAction, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
@@ -23,6 +23,7 @@ export default function CreateComment({refTextarea, tweetId, replies, setReplies
   const {data: session} = useSession();
   const formData = new FormData();
   const commentMedia = useRef<HTMLInputElement | null>(null);
+  const [image, setImage] = useState<string | null>(null);
 
   const handleComment = async (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -79,6 +80,10 @@ export default function CreateComment({refTextarea, tweetId, replies, setReplies
           }
           return prev;
         });
+
+        if (image) {
+          setImage(null);
+        }
       });
     }
   };
@@ -120,16 +125,31 @@ export default function CreateComment({refTextarea, tweetId, replies, setReplies
   }, [session]);
 
   return (
-    <S.Container>
-      <Image src={pfpPlaceholder} width={40} height={40} alt='pfp' />
+    <S.Container onImage={image}>
+      <img src={session?.avatar ? `/uploads/${session?.avatar}` : pfpPlaceholder.src} width={40} height={40} alt='pfp' />
       <S.TextAreaContent>
         {
           canUserReply ? (
             <>
-              <S.TextArea placeholder='Tweet your reply' ref={refTextarea} onKeyDown={(e) => handleComment(e)}/>
-              <MdImage color='#BDBDBD' size={20} onClick={() => commentMedia.current?.click()}/>
-              <input type='file' accept='image/*' hidden ref={commentMedia}/>
+              <div>
+                <S.TextArea placeholder='Tweet your reply' ref={refTextarea} onKeyDown={(e) => handleComment(e)}/>
+                <MdImage color='#BDBDBD' size={20} onClick={() => commentMedia.current?.click()}/>
+                <input
+                  type='file'
+                  accept='image/*'
+                  hidden ref={commentMedia}
+                  onChange={() => setImage(URL.createObjectURL(commentMedia.current?.files![0] as Blob))}/>
+              </div>
+              {
+                image && (
+                  <S.ImagePreview>
+                    <img src={image} alt='pfp' />
+                    <MdClose color='white' size={20} onClick={() => setImage(null)}/>
+                  </S.ImagePreview>
+                )
+              }
             </>
+
           ) : <p style={{color: '#BDBDBD'}}>Only accounts that {tweet.userId.name || tweet.tweetId.userId.name} follows can Reply.</p>
         }
       </S.TextAreaContent>

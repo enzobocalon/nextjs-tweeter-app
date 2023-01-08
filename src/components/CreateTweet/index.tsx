@@ -77,7 +77,7 @@ export default function CreateTweet ({session, setTweets}: Props) {
       <hr />
 
       <S.ContentArea>
-        <Image src={pfpPlaceholder} alt='pfp' width={40} height={40}/>
+        <img src={session?.avatar ? `/uploads/${session?.avatar}` : pfpPlaceholder.src} alt='pfp' width={40} height={40}/>
         <S.TextAreaContent>
           <S.TextArea placeholder="What's happening?" ref={content}/>
           {

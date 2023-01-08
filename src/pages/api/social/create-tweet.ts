@@ -9,6 +9,7 @@ let filename: string;
 
 const getFilename = (originalName: string) => {
   filename = `${new Date().getTime()} - ${originalName}`;
+
   return filename;
 };
 
