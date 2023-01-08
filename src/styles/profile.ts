@@ -47,8 +47,8 @@ export const Overlay = styled.div`
   position: absolute;
   left: 0;
   top: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   background-color: rgba(0,0,0,.2);
   display: flex;
   align-items: center;
@@ -57,5 +57,7 @@ export const Overlay = styled.div`
   > div {
     width: 100%;
     max-width: 636px;
+    max-height: 600px;
+    overflow-y: auto !important;
   }
 `;

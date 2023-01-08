@@ -10,7 +10,7 @@ import axios from 'axios';
 import { getSession, useSession } from 'next-auth/react';
 import { Tweet as ITweet } from '../types/Tweet';
 import { User } from '../types/User';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import FollowModal from '../components/FollowModal';
 
 interface Props {
@@ -30,6 +30,14 @@ export default function Profile ({profile, tweets: tweetsSSR, isFollowing, user}
     setIsFollowers(false);
     setFollowModal(false);
   };
+
+  useEffect(() => {
+    if (followModal) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+  }, [followModal]);
 
   return (
     <>

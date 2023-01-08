@@ -37,10 +37,10 @@ export const ProfileLeft = styled.div`
 `;
 
 export const Bio = styled.div`
-  margin-bottom: 1rem;
+  margin-block: 1rem;
   padding-bottom: 1rem;
 
-  border-bottom: 1px solid #E0E0E0;
+  border-bottom: 2px solid #E0E0E0;
   p {
     font-family: 'Noto Sans';
     font-style: normal;

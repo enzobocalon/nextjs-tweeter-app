@@ -59,7 +59,7 @@ export default function Account({userItem, user}: Props) {
     <>
       <S.Profile>
         <S.ProfileLeft>
-          <img src={pfpPlaceholder.src} />
+          <img src={userData.avatar ? `/uploads/${userData.avatar}` : pfpPlaceholder.src} />
           <div>
             <a href={`/${userData.username}`}>
               <p>{userData.name}</p>
