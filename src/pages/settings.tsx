@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import axios from 'axios';
 import { GetServerSideProps } from 'next';
-import { getSession, useSession } from 'next-auth/react';
+import { getSession, signOut, useSession } from 'next-auth/react';
 import Header from '../components/Header';
 import { StyledContainer } from '../styles/global';
 
@@ -82,6 +82,7 @@ export default function Settings({user}: Props) {
     }).then(() => {
       toast.success('Profile updated.');
       window.location.reload();
+      signOut();
     });
   };
 
@@ -111,7 +112,10 @@ export default function Settings({user}: Props) {
         <S.Settings>
           <StyledContainer>
             <div>
-              <strong>Customize your profile</strong>
+              <div>
+                <strong>Customize your profile</strong>
+                <p>You&apos;ll be signed off to keep your data safe.</p>
+              </div>
               <Button style={{paddingBlock: 8}} onClick={() => setEditing(prev => !prev)}>Edit</Button>
             </div>
             <hr style={{marginBottom: 0}}/>

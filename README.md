@@ -1,36 +1,78 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# About
 
-## Getting Started
+This is a project provided by [DevChallenges](https://devchallenges.io/) and it's meant to be built as a fullstack project.
 
-First, run the development server:
+- User story: I can see my profile or others' profile
 
+- User story: When I am on a profile, I can see Tweets and Retweets. I can also filter by Tweets, Tweets and replies, Media and Likes
+
+- User story: When I am on a profile, I can see followers and following
+
+- User story: When I am on a profile, I can see follow or unfollow the user
+
+- User story: I can navigate between Home, Explore and Bookmarks
+
+- User story: I can navigate to My Profile, Group Chat (optional), Setting/Authentication App.
+
+- User story: When I am on Home, I can post a new Tweet
+
+- User story: When I post a new Tweet, I can choose to upload an image and set the Tweet to be public or only-follower
+
+- User story: When I am on Home, I can see Tweets of people who I follow
+
+- User story: I can Comment, Retweet, Like or Save a Tweet
+
+- User story: I can Comment with image and I can like a comment
+
+- User story: I can see the posted time of the Comments and Tweets
+
+- User story: When I am on Home, I can see the most popular hashtags and people I should follow (it's up to you how to implement this)
+
+- User story: When I am on Explore, I can see the Top, Latest Tweet, or Tweet with Media. I can also choose to see the most popular people <b>(TODO)</b>
+
+- User story: When I am on Bookmarks, I can see the Saved Tweet
+
+# Tools
+
+- Axios
+- Mongoose
+- BCrypt
+- Multer
+- NextJS
+- Next Auth
+- Next Connect
+- React
+- React Icons
+- React Toastify
+- React Spinners
+- Styled Components
+- Typescript
+
+# My Notes about the Project
+The project is far beyond perfection, but it can be used and it could also use some improvements in the backend, as this is my first attempt building a fullstack application with backend included, so the queries in the database could probably use some improvements, as could the data returned from responses.
+This is also my first attemptd building complex databases relationships, so this could also be improved and therefore making the job on frontend easier, as the API responses would have a single pattern to be followed.
+
+I feel I learned a lot about NextJS, NextAuth, Mongoose and Multer by building this project.
+
+# How to run the project
 ```bash
-npm run dev
-# or
-yarn dev
+$ git clone https://github.com/enzobocalon/nextjs-tweeter-app
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then you have to install the project dependencies by using
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+```bash
+$ yarn install
+```
+You can now create a .env file inside the project root folder with the following data
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+MONGODB_URI = `Here goes your database URL` <br/>
+NEXTAUTH_URL = `The URL that your project is running, by default is http://localhost:3000` <br/>
+JWT_SECRET = `Your JWT secret` <br/>
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+And finally
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+```bash
+$ yarn dev
+```
+The project should be running with no problems.

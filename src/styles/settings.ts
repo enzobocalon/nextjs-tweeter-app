@@ -94,8 +94,24 @@ export const Settings = styled.div`
       display: flex;
       align-items: center;
       justify-content: space-between;
+
+      > div {
+        p {
+            font-family: 'Noto Sans';
+            font-style: normal;
+            font-weight: 400;
+            font-size: 12px;
+            line-height: 16px;
+            -webkit-letter-spacing: -0.035em;
+            -moz-letter-spacing: -0.035em;
+            -ms-letter-spacing: -0.035em;
+            letter-spacing: -0.035em;
+            color: #828282;
+          }
+        }
+      }
     }
-  }
+
 
   @media (max-width: 768px) {
     max-width: 100%;
