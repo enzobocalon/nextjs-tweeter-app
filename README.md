@@ -49,7 +49,7 @@ This is a project provided by [DevChallenges](https://devchallenges.io/) and it'
 - Typescript
 
 # My Notes about the Project
-The project is far beyond perfection, but it can be used and it could also use some improvements in the backend, as this is my first attempt building a fullstack application with backend included, so the queries in the database could probably use some improvements, as could the data returned from responses.
+The project is far from perfection, but it can be used and it could also use some improvements in the backend, as this is my first attempt building a fullstack application with backend included, so the queries in the database could probably use some improvements, as could the data returned from responses.
 This is also my first attemptd building complex databases relationships, so this could also be improved and therefore making the job on frontend easier, as the API responses would have a single pattern to be followed.
 
 I feel I learned a lot about NextJS, NextAuth, Mongoose and Multer by building this project.
